@@ -1,15 +1,31 @@
 {
-  "last_updated": "2025-10-06T12:58:23.979704",
-  "total_messages": 11,
+  "last_updated": "2025-10-06T13:13:34.762141",
+  "total_messages": 13,
   "unique_users": 2,
   "messages": [
     {
       "username": "umittadelen",
       "user_url": "https://github.com/umittadelen",
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
+      "body": "<body style=\"font-family:system-ui, sans-serif; padding:24px; background:#f4f4f8;\">\n\n<h2 style=\"margin-bottom:16px;\">✨ Hover + XYZ Inline Buttons ✨</h2>\n\n<!-- 1) Tilt on hover -->\n<button style=\"\n    padding:12px 20px;\n    border:none;\n    border-radius:12px;\n    background:#ff6b81;\n    color:white;\n    font-weight:700;\n    cursor:pointer;\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    box-shadow: 0 8px 15px rgba(255,107,129,0.3);\n    \"\n    rotateX(10deg) rotateY(5deg) scale(1.05)'; this.style.boxShadow='0 15px 25px rgba(255,107,129,0.4)';\"\n    '; this.style.boxShadow='0 8px 15px rgba(255,107,129,0.3)';\"\n    onclick=\"alert('Tilted Button Clicked!')\">\n    Tilt Button\n</button>\n\n<span style=\"display:inline-block; width:12px;\"></span>\n\n<!-- 2) Pop + shadow hover -->\n<button style=\"\n    padding:10px 18px;\n    border:none;\n    border-radius:10px;\n    background:#6b46c1;\n    color:white;\n    font-weight:600;\n    cursor:pointer;\n    transition: transform 0.15s e…",
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T13:13:34.762188"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
+      "body": "<body https://example.com'\">",
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T13:13:34.762210"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
       "body": "",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.979755"
+      "timestamp": "2025-10-06T13:13:34.762228"
     },
     {
       "username": "umittadelen",
@@ -17,15 +33,15 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
       "body": "Herkeze acik html supported chat",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.979778"
+      "timestamp": "2025-10-06T13:13:34.762248"
     },
     {
       "username": "umittadelen",
       "user_url": "https://github.com/umittadelen",
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
-      "body": "<button\n    id=\"press3d\"\n    style=\"padding:10px 20px; border-radius:14px; border:none; background:#ff7a59; color:white; font-weight:700; cursor:pointer; box-shadow:0 8px 0 #d65a3f; transform:translateY(0); transition:transform .08s linear, box-shadow .08s linear;\"\n    1'){ this.dataset.pressed='0'; this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d65a3f'; this.innerText='3D press'; } else { this.dataset.pressed='1'; this.style.transform='translateY(6px)'; this.style.boxShadow='0 2px 0 #d65a3f'; this.innerText='Pressed!'; }\">\n    3D press\n  </button>",
+      "body": "<button\n    id=\"press3d\"\n    style=\"padding:10px 20px; border-radius:14px; border:none; background:#ff7a59; color:white; font-weight:700; cursor:pointer; box-shadow:0 8px 0 #d65a3f; transform:translateY(0); transition:transform .08s linear, box-shadow .08s linear;\"\n    onclick=\"if(this.dataset.pressed==='1'){ this.dataset.pressed='0'; this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d65a3f'; this.innerText='3D press'; } else { this.dataset.pressed='1'; this.style.transform='translateY(6px)'; this.style.boxShadow='0 2px 0 #d65a3f'; this.innerText='Pressed!'; }\">\n    3D press\n  </button>",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.979795"
+      "timestamp": "2025-10-06T13:13:34.762265"
     },
     {
       "username": "goldenXlight",
@@ -33,15 +49,15 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/155965624?v=4",
       "body": "bu ne umit?",
       "user_color": "#355c05",
-      "timestamp": "2025-10-06T12:58:23.980121"
+      "timestamp": "2025-10-06T13:13:34.762560"
     },
     {
       "username": "umittadelen",
       "user_url": "https://github.com/umittadelen",
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
-      "body": "<button\n    style=\"padding:10px 16px; border-radius:12px; border:none; background:#6b46c1; color:white; font-weight:600; cursor:pointer; box-shadow:0 6px 12px rgba(107,70,193,.18);\"\n    Simple rounded clicked')\">\n    Simple rounded\n  </button>",
+      "body": "<button\n    style=\"padding:10px 16px; border-radius:12px; border:none; background:#6b46c1; color:white; font-weight:600; cursor:pointer; box-shadow:0 6px 12px rgba(107,70,193,.18);\"\n    onclick=\"alert('Simple rounded clicked')\">\n    Simple rounded\n  </button>",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.980134"
+      "timestamp": "2025-10-06T13:13:34.762574"
     },
     {
       "username": "umittadelen",
@@ -49,7 +65,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
       "body": "<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item\n    <ul>\n      <li>Indented item</li>\n      <li>Indented item</li>\n    </ul>\n  </li>\n  <li>Fourth item</li>\n</ul>",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.980144"
+      "timestamp": "2025-10-06T13:13:34.762584"
     },
     {
       "username": "umittadelen",
@@ -57,7 +73,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
       "body": "normal\n*bold*\n**italic**\n***both***\n\n<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item\n    <ul>\n      <li>Indented item</li>\n      <li>Indented item</li>\n    </ul>\n  </li>\n  <li>Fourth item</li>\n</ul>",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.980158"
+      "timestamp": "2025-10-06T13:13:34.762593"
     },
     {
       "username": "umittadelen",
@@ -65,7 +81,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/72702832?v=4",
       "body": "Hello\n<img src=\"https://media.istockphoto.com/id/816752606/photo/tv-test-card-or-test-pattern-generic.jpg?s=612x612&w=0&k=20&c=63Jcx_5bFnvBw9elRDLrLKjtDYXr70pKtUK0jXJ2_uY=\">",
       "user_color": "#0d5dfd",
-      "timestamp": "2025-10-06T12:58:23.980168"
+      "timestamp": "2025-10-06T13:13:34.762601"
     },
     {
       "username": "goldenXlight",
@@ -73,7 +89,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/155965624?v=4",
       "body": "*[no message]*",
       "user_color": "#355c05",
-      "timestamp": "2025-10-06T12:58:23.980361"
+      "timestamp": "2025-10-06T13:13:34.762790"
     },
     {
       "username": "goldenXlight",
@@ -81,7 +97,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/155965624?v=4",
       "body": "ytugohipjok",
       "user_color": "#355c05",
-      "timestamp": "2025-10-06T12:58:23.980574"
+      "timestamp": "2025-10-06T13:13:34.762972"
     },
     {
       "username": "goldenXlight",
@@ -89,7 +105,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/155965624?v=4",
       "body": "hello umit",
       "user_color": "#355c05",
-      "timestamp": "2025-10-06T12:58:23.980762"
+      "timestamp": "2025-10-06T13:13:34.763154"
     }
   ]
 }
