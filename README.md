@@ -4,39 +4,32 @@
 
 ---
 
-**💭 2 messages**
+**💭 4 messages**
 
-<style>
-.chat-message {
-    margin: 10px 0;
-    padding: 12px;
-    border-left: 4px solid #0366d6;
-    background: #f6f8fa;
-    border-radius: 6px;
-}
-.chat-username {
-    font-weight: bold;
-    color: #0366d6;
-    text-decoration: none;
-}
-.chat-username:hover {
-    text-decoration: underline;
-}
-.chat-body {
-    margin-top: 4px;
-}
-</style>
-
-<div class="chat-message">
-<a href="https://github.com/umittadelen" class="chat-username">@umittadelen</a>
-<div class="chat-body">test</div>
+<div style="margin: 10px 0; padding: 12px; border-left: 4px solid #0366d6; background: #f6f8fa; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+<a href="https://github.com/umittadelen" style="font-weight: bold; color: #0366d6; text-decoration: none;">@umittadelen</a>
+<div style="margin-top: 8px; line-height: 1.5;">/reset</div>
 </div>
 
 ---
 
-<div class="chat-message">
-<a href="https://github.com/umittadelen" class="chat-username">@umittadelen</a>
-<div class="chat-body">✍️ **Write your chat message here**
+<div style="margin: 10px 0; padding: 12px; border-left: 4px solid #0366d6; background: #f6f8fa; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+<a href="https://github.com/umittadelen" style="font-weight: bold; color: #0366d6; text-decoration: none;">@umittadelen</a>
+<div style="margin-top: 8px; line-height: 1.5;">khwkekjzhkuhqejhcjhekjchrkjhkjehcj</div>
+</div>
+
+---
+
+<div style="margin: 10px 0; padding: 12px; border-left: 4px solid #0366d6; background: #f6f8fa; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+<a href="https://github.com/umittadelen" style="font-weight: bold; color: #0366d6; text-decoration: none;">@umittadelen</a>
+<div style="margin-top: 8px; line-height: 1.5;">test</div>
+</div>
+
+---
+
+<div style="margin: 10px 0; padding: 12px; border-left: 4px solid #0366d6; background: #f6f8fa; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
+<a href="https://github.com/umittadelen" style="font-weight: bold; color: #0366d6; text-decoration: none;">@umittadelen</a>
+<div style="margin-top: 8px; line-height: 1.5;">✍️ **Write your chat message here**
 
 👆 Replace this text with your message and click the green "Submit new issue" button to send it to the chat!
 
