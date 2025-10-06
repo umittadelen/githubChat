@@ -567,7 +567,7 @@
             });
             
             // Preserve other safe HTML tags
-            const safeTags = ['a', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3'];
+            const safeTags = ['a', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'button', 'input', 'select', 'textarea', 'div', 'span'];
             safeTags.forEach(tag => {
                 const regex = new RegExp(`<\\/?${tag}[^>]*>`, 'gi');
                 text = text.replace(regex, (match) => {
