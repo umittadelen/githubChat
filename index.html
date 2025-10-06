@@ -667,11 +667,17 @@
                 
                 // Don't wrap block elements in paragraphs
                 if (trimmed.match(/^<(h[1-6]|ul|ol|blockquote|pre|hr)/)) {
-                    return trimmed.replace(/\n/g, '\n');
+                    return trimmed;
                 }
                 
-                // Regular paragraph
-                return '<p>' + trimmed.replace(/\n/g, '<br>') + '</p>';
+                // For regular text, only add <br> for intentional line breaks
+                // (double spaces at end of line or manual line breaks in text)
+                const lines = trimmed.split('\n').filter(line => line.trim());
+                if (lines.length === 1) {
+                    return '<p>' + lines[0] + '</p>';
+                } else {
+                    return '<p>' + lines.join('<br>') + '</p>';
+                }
             }).filter(p => p).join('\n\n');
             
             // 9. Restore preserved HTML elements
