@@ -13,18 +13,30 @@ messages = []
 
 # Check for admin clean command first
 clean_requested = False
+clean_issue_found = None
 for issue in issues:
-    if issue.user.login == "umittadelen" and issue.body and issue.body.strip().lower() == "/clean":
-        print("🧹 Admin command detected: Cleaning chat...")
+    body_lower = issue.body.lower().strip() if issue.body else ""
+    if (issue.user.login == "umittadelen" and 
+        (body_lower == "/clean" or body_lower == "clean" or body_lower == "/reset" or body_lower == "reset")):
+        print(f"🧹 Admin command detected: Cleaning chat... Found clean command in issue #{issue.number}")
+        print(f"🧹 Command was: '{issue.body.strip()}'")
+        print(f"🧹 User: {issue.user.login}")
         clean_requested = True
+        clean_issue_found = issue
         break
 
 # If clean was requested, close all issues
 if clean_requested:
+    print(f"📋 Total issues found: {len(list(issues))}")
+    issue_count = 0
     for clean_issue in repo.get_issues(state="open"):
-        clean_issue.edit(state="closed")
-        print(f"Closed issue #{clean_issue.number}")
-    print("✅ Chat cleaned successfully!")
+        try:
+            clean_issue.edit(state="closed")
+            print(f"✅ Closed issue #{clean_issue.number}: {clean_issue.title}")
+            issue_count += 1
+        except Exception as e:
+            print(f"❌ Failed to close issue #{clean_issue.number}: {e}")
+    print(f"✅ Chat cleaned successfully! Closed {issue_count} issues.")
     messages = []  # No messages to display
 else:
     # Sort issues by number (newest first) and process messages
