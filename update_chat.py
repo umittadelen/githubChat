@@ -21,8 +21,17 @@ for issue in sorted(issues, key=lambda i: i.number):
 
     messages.append(body)
 
-# Generate README content
-chat_content = "# Chat\n\n" + "\n".join(messages) + "\n"
+# Get repository info for the button link
+repo_name = os.environ["GITHUB_REPOSITORY"]
+
+# Generate README content with new message button
+chat_content = "# Chat\n\n"
+chat_content += f"[![New Message](https://img.shields.io/badge/💬-New_Message-blue?style=for-the-badge)](https://github.com/{repo_name}/issues/new)\n\n"
+
+if messages:
+    chat_content += "\n".join(messages) + "\n"
+else:
+    chat_content += "*Waiting for messages...*\n"
 
 # Update README.md
 with open("README.md", "w", encoding="utf-8") as f:
