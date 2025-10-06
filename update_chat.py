@@ -77,39 +77,19 @@ if messages:
     chat_content += "---\n\n"
     chat_content += f"**💭 {len(messages)} message{'s' if len(messages) != 1 else ''}**\n\n"
     
-    # Add CSS styling for chat messages
-    chat_content += """<style>
-.chat-message {
-    margin: 10px 0;
-    padding: 12px;
-    border-left: 4px solid #0366d6;
-    background: #f6f8fa;
-    border-radius: 6px;
-}
-.chat-username {
-    font-weight: bold;
-    color: #0366d6;
-    text-decoration: none;
-}
-.chat-username:hover {
-    text-decoration: underline;
-}
-.chat-body {
-    margin-top: 4px;
-}
-</style>
-
-"""
-    
     for i, message_data in enumerate(messages, 1):
         username = message_data['username']
         user_url = message_data['user_url']
         body = message_data['body']
         
-        # Create HTML-styled message container
-        chat_content += f"""<div class="chat-message">
-<a href="{user_url}" class="chat-username">@{username}</a>
-<div class="chat-body">{body}</div>
+        # Create HTML-styled message container with inline styles (GitHub compatible)
+        message_style = "margin: 10px 0; padding: 12px; border-left: 4px solid #0366d6; background: #f6f8fa; border-radius: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;"
+        username_style = "font-weight: bold; color: #0366d6; text-decoration: none;"
+        body_style = "margin-top: 8px; line-height: 1.5;"
+        
+        chat_content += f"""<div style="{message_style}">
+<a href="{user_url}" style="{username_style}">@{username}</a>
+<div style="{body_style}">{body}</div>
 </div>
 
 """
