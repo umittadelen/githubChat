@@ -180,21 +180,21 @@ def generate_user_color(username):
     
     # Pleasant color palette
     colors = [
-        '#FF6B6B',  # Red
-        '#4ECDC4',  # Teal
-        '#45B7D1',  # Blue
-        '#96CEB4',  # Green
-        '#FFEAA7',  # Yellow
-        '#DDA0DD',  # Plum
-        '#98D8C8',  # Mint
-        '#F7DC6F',  # Gold
-        '#BB8FCE',  # Purple
-        '#85C1E9',  # Light Blue
-        '#F8C471',  # Orange
-        '#82E0AA',  # Light Green
-        '#F1948A',  # Pink
-        '#85C1E9',  # Sky Blue
-        '#D7DBDD'   # Light Gray
+        '#E74C3C',  # Red
+        '#16A085',  # Dark Teal
+        '#2980B9',  # Blue
+        '#27AE60',  # Green
+        '#F39C12',  # Orange
+        '#8E44AD',  # Purple
+        '#2C3E50',  # Dark Blue
+        '#D35400',  # Dark Orange
+        '#7F8C8D',  # Gray
+        '#C0392B',  # Dark Red
+        '#1ABC9C',  # Turquoise
+        '#9B59B6',  # Violet
+        '#34495E',  # Dark Gray
+        '#E67E22',  # Carrot
+        '#3498DB'   # Light Blue
     ]
     
     # Select color based on hash
