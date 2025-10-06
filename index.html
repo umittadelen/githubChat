@@ -387,7 +387,7 @@
         </div>
         
         <div class="warning-message" style="background: #fff8c5; border: 1px solid #d1cc71; color: #24292f; padding: 12px 16px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
-            🔒 <strong>Security Notice:</strong> HTML content with safe interactions allowed. Click events and hover animations work, but auto-loading scripts are blocked for safety.
+            🔒 <strong>Security Notice:</strong> HTML content with safe interactions allowed. Click events and hover animations work. External redirects require confirmation for your safety.
         </div>
         
         <div class="chat-container">
@@ -706,6 +706,20 @@
                 html = html.replace(regex, '');
             });
             
+            // Wrap dangerous redirect patterns with safe redirect function
+            html = html.replace(
+                /onclick\s*=\s*['""]([^'""]*(?:window\.location|location\.href)[^'""]*)['""]/, 
+                (match, onclickContent) => {
+                    // Extract the URL from the onclick
+                    const urlMatch = onclickContent.match(/(?:window\.location|location\.href)\s*=\s*['"`]([^'"`]+)['"`]/);
+                    if (urlMatch) {
+                        const url = urlMatch[1];
+                        return `onclick="return safeRedirect('${url}', this.textContent)"`;
+                    }
+                    return match;
+                }
+            );
+            
             // Remove javascript: URLs
             html = html.replace(/href\s*=\s*['""]javascript:[^'""]*['""]/, 'href="#"');
             html = html.replace(/src\s*=\s*['""]javascript:[^'""]*['""]/, '');
@@ -713,7 +727,7 @@
             // Remove data URLs that could contain scripts
             html = html.replace(/src\s*=\s*['""]data:text\/html[^'""]*['""]/, '');
             
-            console.log('Client-side HTML sanitization applied');
+            console.log('Client-side HTML sanitization applied with redirect protection');
             return html;
         }
         
@@ -950,6 +964,98 @@
                     });
             });
         }
+        
+        // Redirect Protection System
+        function interceptRedirects() {
+            // Override window.location assignments
+            const originalLocationSetter = Object.getOwnPropertyDescriptor(window, 'location') || 
+                                          Object.getOwnPropertyDescriptor(Window.prototype, 'location');
+            
+            // Intercept direct window.location changes
+            let currentLocation = window.location.href;
+            
+            // Monitor for programmatic redirects
+            const observer = new MutationObserver(() => {
+                // Check all buttons and clickable elements for dangerous onclick handlers
+                document.querySelectorAll('[onclick]').forEach(element => {
+                    const onclickAttr = element.getAttribute('onclick');
+                    if (onclickAttr && (onclickAttr.includes('window.location') || onclickAttr.includes('location.href'))) {
+                        console.warn('Potentially dangerous redirect detected:', onclickAttr);
+                    }
+                });
+            });
+            
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+        
+        // Safe redirect function with user confirmation
+        function safeRedirect(url, elementText = 'this element') {
+            // Validate URL
+            try {
+                const urlObj = new URL(url, window.location.origin);
+                const domain = urlObj.hostname;
+                
+                // Check if it's the same domain
+                if (domain === window.location.hostname) {
+                    window.location.href = url;
+                    return true;
+                }
+                
+                // Show confirmation for external links
+                const confirmMessage = `Do you want to be redirected to:\n\n${domain}\n\nURL: ${url}\n\nOnly click "OK" if you trust this link.`;
+                
+                if (confirm(confirmMessage)) {
+                    // Open in new tab for safety
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                    return true;
+                } else {
+                    console.log('User declined redirect to:', url);
+                    return false;
+                }
+            } catch (error) {
+                alert('Invalid URL detected. Redirect blocked for your safety.');
+                console.error('Invalid URL:', url, error);
+                return false;
+            }
+        }
+        
+        // Global click handler for additional protection
+        document.addEventListener('click', function(event) {
+            const element = event.target.closest('[onclick]');
+            if (element) {
+                const onclickCode = element.getAttribute('onclick');
+                
+                // Check for window.location redirects
+                const locationMatch = onclickCode.match(/(?:window\.location|location\.href)\s*=\s*['"`]([^'"`]+)['"`]/);
+                if (locationMatch) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const url = locationMatch[1];
+                    const elementText = element.textContent || element.title || 'this element';
+                    
+                    if (safeRedirect(url, elementText)) {
+                        // If user confirmed, we already handled the redirect
+                        return;
+                    }
+                    return false;
+                }
+                
+                // Check for window.open calls
+                const openMatch = onclickCode.match(/window\.open\s*\(\s*['"`]([^'"`]+)['"`]/);
+                if (openMatch) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const url = openMatch[1];
+                    safeRedirect(url, element.textContent || 'this link');
+                    return false;
+                }
+            }
+        }, true); // Use capture phase to intercept early
+        
+        // Initialize redirect protection
+        interceptRedirects();
         
         // Load messages on page load
         loadMessages();

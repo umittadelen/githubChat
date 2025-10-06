@@ -26,11 +26,13 @@ This application implements several security measures:
 1. **Input Sanitization**: HTML content is sanitized to prevent XSS attacks
 2. **Event Handler Filtering**: Auto-executing events (onload, onerror, etc.) are blocked
 3. **User Interaction Only**: Only user-triggered events (onclick) are permitted
-4. **JavaScript URL Blocking**: javascript: URLs are filtered out
+4. **Redirect Protection**: External redirects require user confirmation with URL preview
+5. **JavaScript URL Blocking**: javascript: URLs are filtered out
 5. **Rate Limiting**: GitHub API rate limits are respected
 6. **Environment Variables**: Sensitive data is stored in environment variables
 7. **Content Security Policy**: CSP headers help prevent injection attacks
 8. **HTTPS Only**: All communications are encrypted
+9. **Redirect Confirmation**: External redirects require user confirmation with URL preview
 
 ### Allowed vs Blocked Events
 
@@ -75,8 +77,8 @@ This application implements several security measures:
 - **Description**: Malicious onclick events can execute arbitrary JavaScript when users click
 - **Example**: `onclick="window.location='http://malicious-site.com'"`
 - **Impact**: Users can be redirected to malicious websites
-- **Mitigation**: User awareness, verify button authenticity before clicking
-- **Status**: Accepted risk - inherent to allowing onclick events
+- **Mitigation**: ✅ **IMPLEMENTED** - Redirect confirmation system with URL preview, external links open in new tabs
+- **Status**: Mitigated - users receive clear confirmation prompts
 
 ### Medium Risk
 
