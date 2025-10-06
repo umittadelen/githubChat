@@ -13,13 +13,20 @@ messages = []
 
 # Sort issues by number (oldest first)
 for issue in sorted(issues, key=lambda i: i.number):
+    username = issue.user.login
     body = issue.body.strip().replace("\r", "")
     
-    # Cut message to MAX_LENGTH and add "…" if trimmed
-    if len(body) > MAX_LENGTH:
-        body = body[:MAX_LENGTH-1] + "…"
-
-    messages.append(body)
+    # Calculate available space for message (accounting for username and formatting)
+    username_prefix = f"{username}: "
+    available_length = MAX_LENGTH - len(username_prefix)
+    
+    # Cut message to available length and add "…" if trimmed
+    if len(body) > available_length:
+        body = body[:available_length-1] + "…"
+    
+    # Format as "username: message"
+    formatted_message = f"{username}: {body}"
+    messages.append(formatted_message)
 
 # Get repository info for the button link
 repo_name = os.environ["GITHUB_REPOSITORY"]
