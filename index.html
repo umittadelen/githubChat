@@ -553,32 +553,6 @@
         }
         
         function convertMarkdownToHtml(text) {
-            // First, extract and preserve image tags and other safe HTML
-            const htmlElements = [];
-            let elementIndex = 0;
-            
-            // Preserve image tags
-            text = text.replace(/<img[^>]+>/gi, (match) => {
-                if (match.includes('src=')) {
-                    htmlElements.push(match);
-                    return `__HTML_ELEMENT_${elementIndex++}__`;
-                }
-                return match;
-            });
-            
-            // Preserve other safe HTML tags
-            const safeTags = ['a', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'button', 'input', 'select', 'textarea', 'div', 'span'];
-            safeTags.forEach(tag => {
-                const regex = new RegExp(`<\\/?${tag}[^>]*>`, 'gi');
-                text = text.replace(regex, (match) => {
-                    htmlElements.push(match);
-                    return `__HTML_ELEMENT_${elementIndex++}__`;
-                });
-            });
-            
-            // Escape remaining HTML to prevent XSS
-            text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            
             let html = text;
             
             // Convert markdown to HTML - order matters!
@@ -690,11 +664,6 @@
                     return '<p>' + lines.join('<br>') + '</p>';
                 }
             }).filter(p => p).join('\n\n');
-            
-            // 9. Restore preserved HTML elements
-            htmlElements.forEach((element, index) => {
-                html = html.replace(`__HTML_ELEMENT_${index}__`, element);
-            });
             
             return html;
         }
