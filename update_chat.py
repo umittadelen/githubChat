@@ -157,7 +157,6 @@ def generate_chat_content(messages, repo_name):
                 username = message_data['username']
                 user_url = message_data['user_url']
                 body = message_data['body']
-                issue_number = message_data.get('issue_number', '')
                 
                 # Enhanced styling
                 message_style = (
@@ -170,12 +169,10 @@ def generate_chat_content(messages, repo_name):
                 )
                 username_style = "font-weight: bold; color: #0366d6; text-decoration: none; font-size: 14px;"
                 body_style = "margin-top: 8px; line-height: 1.6; color: #24292e;"
-                meta_style = "font-size: 11px; color: #586069; margin-top: 8px;"
                 
                 chat_content += f"""<div style="{message_style}">
 <div>
 <a href="{user_url}" style="{username_style}">@{username}</a>
-{f'<span style="{meta_style}"> • #{issue_number}</span>' if issue_number else ''}
 </div>
 <div style="{body_style}">{body}</div>
 </div>
@@ -248,8 +245,7 @@ def main():
                     message_data = {
                         'username': username,
                         'user_url': user_url,
-                        'body': body,
-                        'issue_number': issue.number
+                        'body': body
                     }
                     messages.append(message_data)
                     
