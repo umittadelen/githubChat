@@ -392,28 +392,14 @@
                 hash = username.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // Generate a pleasant color palette
-            const colors = [
-                '#E74C3C', // Red
-                '#16A085', // Dark Teal
-                '#2980B9', // Blue
-                '#27AE60', // Green
-                '#F39C12', // Orange
-                '#8E44AD', // Purple
-                '#2C3E50', // Dark Blue
-                '#D35400', // Dark Orange
-                '#7F8C8D', // Gray
-                '#C0392B', // Dark Red
-                '#1ABC9C', // Turquoise
-                '#9B59B6', // Violet
-                '#34495E', // Dark Gray
-                '#E67E22', // Carrot
-                '#3498DB'  // Light Blue
-            ];
+            // Use hash to generate HSL values for unlimited unique colors
+            const hue = Math.abs(hash) % 360; // 0-359 degrees for hue
             
-            // Use hash to select color
-            const colorIndex = Math.abs(hash) % colors.length;
-            return colors[colorIndex];
+            // Generate saturation and lightness that ensure good readability
+            const saturation = 45 + (Math.abs(hash >> 8) % 35); // 45-80% saturation
+            const lightness = 35 + (Math.abs(hash >> 16) % 20); // 35-55% lightness
+            
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
         
         function displayMessages(messages) {

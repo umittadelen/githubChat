@@ -178,28 +178,51 @@ def generate_user_color(username):
     for char in username:
         hash_value = ord(char) + ((hash_value << 5) - hash_value)
     
-    # Pleasant color palette
-    colors = [
-        '#E74C3C',  # Red
-        '#16A085',  # Dark Teal
-        '#2980B9',  # Blue
-        '#27AE60',  # Green
-        '#F39C12',  # Orange
-        '#8E44AD',  # Purple
-        '#2C3E50',  # Dark Blue
-        '#D35400',  # Dark Orange
-        '#7F8C8D',  # Gray
-        '#C0392B',  # Dark Red
-        '#1ABC9C',  # Turquoise
-        '#9B59B6',  # Violet
-        '#34495E',  # Dark Gray
-        '#E67E22',  # Carrot
-        '#3498DB'   # Light Blue
-    ]
+    # Use hash to generate HSL values for unlimited unique colors
+    hue = abs(hash_value) % 360  # 0-359 degrees for hue
     
-    # Select color based on hash
-    color_index = abs(hash_value) % len(colors)
-    return colors[color_index]
+    # Generate saturation and lightness that ensure good readability
+    saturation = 45 + (abs(hash_value >> 8) % 35)  # 45-80% saturation
+    lightness = 35 + (abs(hash_value >> 16) % 20)  # 35-55% lightness
+    
+    # Convert HSL to hex for HTML/CSS compatibility
+    return hsl_to_hex(hue, saturation, lightness)
+
+def hsl_to_hex(h, s, l):
+    """Convert HSL to hex color"""
+    # Normalize values
+    h = h / 360.0
+    s = s / 100.0
+    l = l / 100.0
+    
+    def hue_to_rgb(p, q, t):
+        if t < 0:
+            t += 1
+        if t > 1:
+            t -= 1
+        if t < 1/6:
+            return p + (q - p) * 6 * t
+        if t < 1/2:
+            return q
+        if t < 2/3:
+            return p + (q - p) * (2/3 - t) * 6
+        return p
+    
+    if s == 0:
+        r = g = b = l  # achromatic
+    else:
+        q = l * (1 + s) if l < 0.5 else l + s - l * s
+        p = 2 * l - q
+        r = hue_to_rgb(p, q, h + 1/3)
+        g = hue_to_rgb(p, q, h)
+        b = hue_to_rgb(p, q, h - 1/3)
+    
+    # Convert to hex
+    r = int(round(r * 255))
+    g = int(round(g * 255))
+    b = int(round(b * 255))
+    
+    return f"#{r:02x}{g:02x}{b:02x}"
 
 def generate_chat_content(messages, repo_name):
     """Generate the README chat content"""
