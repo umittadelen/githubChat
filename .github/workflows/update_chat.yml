@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install PyGithub requests
+          pip install -r requirements.txt
           
       - name: Run chat update script
         run: python update_chat.py
