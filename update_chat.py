@@ -111,15 +111,10 @@ def sanitize_html(text):
         r'<select[^>]*>.*?</select>',
     ]
     
-    # Remove dangerous event handlers (allow only onclick for user interaction)
+    # Remove dangerous event handlers (allow onclick, onmouseover, onmouseout for safe interactions)
     dangerous_events = [
         r'onload\s*=\s*["\'][^"\']*["\']',
         r'onerror\s*=\s*["\'][^"\']*["\']',
-        r'onmouseover\s*=\s*["\'][^"\']*["\']',
-        r'onmouseout\s*=\s*["\'][^"\']*["\']',
-        r'onmousemove\s*=\s*["\'][^"\']*["\']',
-        r'onmousedown\s*=\s*["\'][^"\']*["\']',
-        r'onmouseup\s*=\s*["\'][^"\']*["\']',
         r'onfocus\s*=\s*["\'][^"\']*["\']',
         r'onblur\s*=\s*["\'][^"\']*["\']',
         r'onchange\s*=\s*["\'][^"\']*["\']',

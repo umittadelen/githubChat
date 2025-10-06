@@ -34,16 +34,18 @@ This application implements several security measures:
 
 ### Allowed vs Blocked Events
 
-**✅ Allowed (User-triggered):**
+**✅ Allowed (Safe User Interactions):**
 - `onclick` - User must click to trigger
+- `onmouseover`, `onmouseout` - Safe hover animations and effects
+- `onmousedown`, `onmouseup`, `onmousemove` - Mouse interaction events
 
-**❌ Blocked (Auto-executing):**
+**❌ Blocked (Auto-executing/Dangerous):**
 - `onload`, `onerror` - Execute automatically when page/element loads
-- `onmouseover`, `onmouseout` - Execute on mouse hover
-- `onfocus`, `onblur` - Execute on element focus changes
+- `onfocus`, `onblur` - Execute on element focus changes  
 - `onchange`, `onsubmit` - Execute on form interactions
 - `onkeydown`, `onkeyup` - Execute on keyboard input
-- And many other automatic event handlers
+- `onresize`, `onscroll` - Execute on window/page changes
+- Drag, touch, and animation completion events
 
 ### Security Best Practices for Users
 
@@ -53,10 +55,10 @@ This application implements several security measures:
 
 ### Known Security Considerations
 
-1. **HTML content is allowed with restrictions** - Auto-executing events are blocked, only user-triggered events (onclick) permitted
+1. **HTML content with safe interactions** - Mouse events for animations allowed, auto-executing events blocked
 2. **GitHub Issues are public** - All messages are visible to anyone
 3. **Admin commands are restricted** - Only authorized users can execute admin commands
-4. **Clickjacking protection** - Users should verify the authenticity of interactive elements before clicking
+4. **Interactive content verification** - Users should verify authenticity of interactive elements before engaging
 
 ## Updates
 

@@ -387,7 +387,7 @@
         </div>
         
         <div class="warning-message" style="background: #fff8c5; border: 1px solid #d1cc71; color: #24292f; padding: 12px 16px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
-            🔒 <strong>Security Notice:</strong> HTML content is allowed but auto-executing events (onload, onerror, etc.) are blocked. Only user-triggered events (onclick) are permitted for safety.
+            🔒 <strong>Security Notice:</strong> HTML content with safe interactions allowed. Click events and hover animations work, but auto-loading scripts are blocked for safety.
         </div>
         
         <div class="chat-container">
@@ -690,10 +690,9 @@
         function sanitizeClientHtml(html) {
             if (!html) return html;
             
-            // List of dangerous event handlers to remove (keep only onclick)
+            // List of dangerous event handlers to remove (allow onclick, onmouseover, onmouseout for animations)
             const dangerousEvents = [
-                'onload', 'onerror', 'onmouseover', 'onmouseout', 'onmousemove',
-                'onmousedown', 'onmouseup', 'onfocus', 'onblur', 'onchange',
+                'onload', 'onerror', 'onfocus', 'onblur', 'onchange',
                 'onsubmit', 'onreset', 'onkeydown', 'onkeyup', 'onkeypress',
                 'onresize', 'onscroll', 'onunload', 'onbeforeunload',
                 'ondragstart', 'ondrag', 'ondragend', 'ondrop', 'ondragover',
