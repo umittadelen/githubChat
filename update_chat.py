@@ -11,6 +11,8 @@ import time
 import json
 from datetime import datetime
 import re
+import hashlib
+import random
 
 # Configuration
 MAX_LENGTH = 500  # max characters per message (increased for HTML content)
@@ -31,6 +33,41 @@ def safe_get_env(var_name, default=None):
         log(f"❌ ERROR: Required environment variable '{var_name}' not found")
         sys.exit(1)
     return value
+
+def generate_display_name(username):
+    """Generate a consistent random display name based on username"""
+    # Lists of fun adjectives and nouns for name generation
+    adjectives = [
+        "Swift", "Brave", "Clever", "Bright", "Bold", "Quick", "Smart", "Cool", 
+        "Epic", "Super", "Mighty", "Noble", "Cosmic", "Royal", "Golden", "Silver",
+        "Crystal", "Thunder", "Lightning", "Storm", "Fire", "Ice", "Star", "Moon",
+        "Solar", "Nova", "Quantum", "Digital", "Cyber", "Tech", "Code", "Binary",
+        "Pixel", "Neon", "Retro", "Future", "Alpha", "Beta", "Prime", "Ultra",
+        "Mega", "Turbo", "Hyper", "Zen", "Mystic", "Shadow", "Ghost", "Phantom"
+    ]
+    
+    nouns = [
+        "Coder", "Hacker", "Ninja", "Wizard", "Master", "Guardian", "Knight", "Hero",
+        "Champion", "Legend", "Phoenix", "Dragon", "Tiger", "Eagle", "Wolf", "Fox",
+        "Panda", "Bear", "Lion", "Shark", "Falcon", "Raven", "Cat", "Dog",
+        "Robot", "Cyborg", "Android", "Byte", "Bit", "Node", "Core", "Matrix",
+        "Network", "Server", "Client", "Parser", "Builder", "Creator", "Designer",
+        "Artist", "Gamer", "Player", "Runner", "Walker", "Flyer", "Swimmer"
+    ]
+    
+    # Create a hash from username for consistent randomness
+    username_hash = hashlib.md5(username.lower().encode()).hexdigest()
+    
+    # Use hash to seed random selection
+    adj_index = int(username_hash[:8], 16) % len(adjectives)
+    noun_index = int(username_hash[8:16], 16) % len(nouns)
+    
+    # Generate number based on hash for uniqueness
+    number = int(username_hash[16:20], 16) % 999 + 1
+    
+    display_name = f"{adjectives[adj_index]}{nouns[noun_index]}{number:03d}"
+    
+    return display_name
 
 def sanitize_html(text):
     """Basic HTML sanitization to prevent XSS"""
@@ -192,6 +229,7 @@ def generate_chat_content(messages, repo_name):
             
             for i, message_data in enumerate(messages, 1):
                 username = message_data['username']
+                display_name = message_data.get('display_name', username)  # Fallback to username
                 user_url = message_data['user_url']
                 body = message_data['body']
                 
@@ -206,9 +244,10 @@ def generate_chat_content(messages, repo_name):
                 )
                 username_style = "font-weight: bold; color: #0366d6; text-decoration: none; font-size: 14px;"
                 
+                # Show both display name and real username
                 # Use blockquote for message styling that preserves markdown
                 chat_content += f"""<div style="{message_style}">
-<a href="{user_url}" style="{username_style}">@{username}</a>
+<a href="{user_url}" style="{username_style}">{display_name}</a> <span style="color: #666; font-size: 12px;">(@{username})</span>
 </div>
 
 > {body}
@@ -284,12 +323,14 @@ def main():
                 try:
                     username = issue.user.login
                     user_url = f"https://github.com/{username}"
+                    display_name = generate_display_name(username)
                     
                     # Process message body
                     body = process_message_body(issue.body, username, MAX_LENGTH)
                     
                     message_data = {
-                        'username': username,
+                        'username': username,  # Keep original for admin checks
+                        'display_name': display_name,  # New display name
                         'user_url': user_url,
                         'body': body
                     }
@@ -319,6 +360,7 @@ def main():
                 "messages": [
                     {
                         "username": msg['username'],
+                        "display_name": msg.get('display_name', msg['username']),
                         "user_url": msg['user_url'],
                         "body": msg['body'],
                         "timestamp": datetime.now().isoformat()  # In real implementation, use issue creation time
