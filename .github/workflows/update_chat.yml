@@ -2,26 +2,55 @@ name: Update Chat
 on:
   issues:
     types: [opened, edited, closed, reopened]
+  workflow_dispatch: # Allow manual triggering
   
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Prevent hanging
     permissions:
       contents: write
       issues: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          python-version: '3.x'
-      - run: pip install PyGithub
-      - run: python update_chat.py
+          fetch-depth: 0
+          
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install PyGithub requests
+          
+      - name: Run chat update script
+        run: python update_chat.py
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-      - run: |
+        timeout-minutes: 5
+        
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add README.md
-          git diff --staged --quiet || git commit -m "Update chat"
+          git commit -m "🤖 Update chat [automated]"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
