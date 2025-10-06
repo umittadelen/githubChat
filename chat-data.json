@@ -1,35 +1,56 @@
 {
-  "last_updated": "2025-10-06T11:04:00.741015",
-  "total_messages": 4,
+  "last_updated": "2025-10-06T11:46:19.169163",
+  "total_messages": 7,
   "unique_users": 2,
   "messages": [
     {
       "username": "umittadelen",
       "user_url": "https://github.com/umittadelen",
+      "body": "<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item\n    <ul>\n      <li>Indented item</li>\n      <li>Indented item</li>\n    </ul>\n  </li>\n  <li>Fourth item</li>\n</ul>",
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T11:46:19.169200"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
+      "body": "<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item\n    <ul>\n      <li>Indented item</li>\n      <li>Indented item</li>\n    </ul>\n  </li>\n  <li>Fourth item</li>\n</ul>",
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T11:46:19.169215"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
+      "body": "normal\n*bold*\n**italic**\n***both***\n\n<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item\n    <ul>\n      <li>Indented item</li>\n      <li>Indented item</li>\n    </ul>\n  </li>\n  <li>Fourth item</li>\n</ul>",
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T11:46:19.169225"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
       "body": "Hello\n<img src=\"https://media.istockphoto.com/id/816752606/photo/tv-test-card-or-test-pattern-generic.jpg?s=612x612&w=0&k=20&c=63Jcx_5bFnvBw9elRDLrLKjtDYXr70pKtUK0jXJ2_uY=\">",
-      "user_color": "#F8C471",
-      "timestamp": "2025-10-06T11:04:00.741027"
+      "user_color": "#0d5dfd",
+      "timestamp": "2025-10-06T11:46:19.169239"
     },
     {
       "username": "goldenXlight",
       "user_url": "https://github.com/goldenXlight",
       "body": "*[no message]*",
-      "user_color": "#F1948A",
-      "timestamp": "2025-10-06T11:04:00.741032"
+      "user_color": "#355c05",
+      "timestamp": "2025-10-06T11:46:19.169467"
     },
     {
       "username": "goldenXlight",
       "user_url": "https://github.com/goldenXlight",
       "body": "ytugohipjok",
-      "user_color": "#F1948A",
-      "timestamp": "2025-10-06T11:04:00.741036"
+      "user_color": "#355c05",
+      "timestamp": "2025-10-06T11:46:19.169659"
     },
     {
       "username": "goldenXlight",
       "user_url": "https://github.com/goldenXlight",
       "body": "hello umit",
-      "user_color": "#F1948A",
-      "timestamp": "2025-10-06T11:04:00.741040"
+      "user_color": "#355c05",
+      "timestamp": "2025-10-06T11:46:19.169848"
     }
   ]
 }
