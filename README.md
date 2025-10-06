@@ -1,1 +1,2 @@
-# githubChat
+# Chat
+*Waiting for messages...*
