@@ -11,8 +11,8 @@ repo = g.get_repo(os.environ["GITHUB_REPOSITORY"])
 issues = repo.get_issues(state="open")
 messages = []
 
-# Sort issues by number (oldest first)
-for issue in sorted(issues, key=lambda i: i.number):
+# Sort issues by number (newest first)
+for issue in sorted(issues, key=lambda i: i.number, reverse=True):
     username = issue.user.login
     body = issue.body.strip().replace("\r", "")
     
