@@ -14,7 +14,7 @@ import re
 # Configuration
 MAX_LENGTH = 500  # max characters per message (increased for HTML content)
 ADMIN_USERS = ["umittadelen"]  # List of admin users
-CLEAN_COMMANDS = ["/clean", "clean", "/reset", "reset", "/clear", "clear"]
+CLEAN_COMMANDS = ["/clean", "/reset", "/clear"]  # Only slash commands for security
 MAX_MESSAGES = 50  # Limit number of messages to prevent performance issues
 
 def log(message):
