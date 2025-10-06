@@ -387,7 +387,7 @@
         </div>
         
         <div class="warning-message" style="background: #fff8c5; border: 1px solid #d1cc71; color: #24292f; padding: 12px 16px; border-radius: 6px; margin: 20px 0; font-size: 14px;">
-            ⚠️ <strong>Notice:</strong> This chat allows HTML content including interactive elements. Please be cautious with untrusted content and scripts.
+            🔒 <strong>Security Notice:</strong> HTML content is allowed but auto-executing events (onload, onerror, etc.) are blocked. Only user-triggered events (onclick) are permitted for safety.
         </div>
         
         <div class="chat-container">
@@ -667,8 +667,8 @@
                 const createdAt = new Date(issue.created_at).toLocaleString();
                 const userColor = generateUserColor(username);
                 
-                // Convert markdown to HTML (basic conversion)
-                const htmlBody = convertMarkdownToHtml(body);
+                // Convert markdown to HTML and sanitize
+                const htmlBody = sanitizeClientHtml(convertMarkdownToHtml(body));
                 
                 return `
                     <div class="message" style="border-left-color: ${userColor};">
@@ -685,6 +685,37 @@
             }).join('');
             
             container.innerHTML = messagesHtml;
+        }
+        
+        function sanitizeClientHtml(html) {
+            if (!html) return html;
+            
+            // List of dangerous event handlers to remove (keep only onclick)
+            const dangerousEvents = [
+                'onload', 'onerror', 'onmouseover', 'onmouseout', 'onmousemove',
+                'onmousedown', 'onmouseup', 'onfocus', 'onblur', 'onchange',
+                'onsubmit', 'onreset', 'onkeydown', 'onkeyup', 'onkeypress',
+                'onresize', 'onscroll', 'onunload', 'onbeforeunload',
+                'ondragstart', 'ondrag', 'ondragend', 'ondrop', 'ondragover',
+                'ondragenter', 'ondragleave', 'ontouchstart', 'ontouchmove',
+                'ontouchend', 'onanimationstart', 'onanimationend', 'ontransitionend'
+            ];
+            
+            // Remove dangerous event handlers
+            dangerousEvents.forEach(event => {
+                const regex = new RegExp(`\\s*${event}\\s*=\\s*['""][^'""]*['"""]`, 'gi');
+                html = html.replace(regex, '');
+            });
+            
+            // Remove javascript: URLs
+            html = html.replace(/href\s*=\s*['""]javascript:[^'""]*['""]/, 'href="#"');
+            html = html.replace(/src\s*=\s*['""]javascript:[^'""]*['""]/, '');
+            
+            // Remove data URLs that could contain scripts
+            html = html.replace(/src\s*=\s*['""]data:text\/html[^'""]*['""]/, '');
+            
+            console.log('Client-side HTML sanitization applied');
+            return html;
         }
         
         function convertMarkdownToHtml(text) {

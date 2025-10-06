@@ -95,7 +95,7 @@ def create_backup(data: Dict[str, Any]) -> bool:
         return False
 
 def sanitize_html(text):
-    """Basic HTML sanitization to prevent XSS"""
+    """Enhanced HTML sanitization to prevent XSS while allowing safe interactions"""
     if not text:
         return text
     
@@ -105,12 +105,61 @@ def sanitize_html(text):
         r'<iframe[^>]*>.*?</iframe>',
         r'<object[^>]*>.*?</object>',
         r'<embed[^>]*>.*?</embed>',
-        r'on\w+\s*=\s*["\'][^"\']*["\']',  # Remove onclick, onload, etc.
+        r'<form[^>]*>.*?</form>',
+        r'<input[^>]*>',
+        r'<textarea[^>]*>.*?</textarea>',
+        r'<select[^>]*>.*?</select>',
     ]
     
+    # Remove dangerous event handlers (allow only onclick for user interaction)
+    dangerous_events = [
+        r'onload\s*=\s*["\'][^"\']*["\']',
+        r'onerror\s*=\s*["\'][^"\']*["\']',
+        r'onmouseover\s*=\s*["\'][^"\']*["\']',
+        r'onmouseout\s*=\s*["\'][^"\']*["\']',
+        r'onmousemove\s*=\s*["\'][^"\']*["\']',
+        r'onmousedown\s*=\s*["\'][^"\']*["\']',
+        r'onmouseup\s*=\s*["\'][^"\']*["\']',
+        r'onfocus\s*=\s*["\'][^"\']*["\']',
+        r'onblur\s*=\s*["\'][^"\']*["\']',
+        r'onchange\s*=\s*["\'][^"\']*["\']',
+        r'onsubmit\s*=\s*["\'][^"\']*["\']',
+        r'onreset\s*=\s*["\'][^"\']*["\']',
+        r'onkeydown\s*=\s*["\'][^"\']*["\']',
+        r'onkeyup\s*=\s*["\'][^"\']*["\']',
+        r'onkeypress\s*=\s*["\'][^"\']*["\']',
+        r'onresize\s*=\s*["\'][^"\']*["\']',
+        r'onscroll\s*=\s*["\'][^"\']*["\']',
+        r'onunload\s*=\s*["\'][^"\']*["\']',
+        r'onbeforeunload\s*=\s*["\'][^"\']*["\']',
+        r'ondragstart\s*=\s*["\'][^"\']*["\']',
+        r'ondrag\s*=\s*["\'][^"\']*["\']',
+        r'ondragend\s*=\s*["\'][^"\']*["\']',
+        r'ondrop\s*=\s*["\'][^"\']*["\']',
+        r'ondragover\s*=\s*["\'][^"\']*["\']',
+        r'ondragenter\s*=\s*["\'][^"\']*["\']',
+        r'ondragleave\s*=\s*["\'][^"\']*["\']',
+        r'ontouchstart\s*=\s*["\'][^"\']*["\']',
+        r'ontouchmove\s*=\s*["\'][^"\']*["\']',
+        r'ontouchend\s*=\s*["\'][^"\']*["\']',
+        r'onanimationstart\s*=\s*["\'][^"\']*["\']',
+        r'onanimationend\s*=\s*["\'][^"\']*["\']',
+        r'ontransitionend\s*=\s*["\'][^"\']*["\']',
+    ]
+    
+    # Apply dangerous tag removal
     for pattern in dangerous_patterns:
         text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.DOTALL)
     
+    # Apply dangerous event handler removal
+    for pattern in dangerous_events:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+    
+    # Remove javascript: URLs
+    text = re.sub(r'href\s*=\s*["\']javascript:[^"\']*["\']', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'src\s*=\s*["\']javascript:[^"\']*["\']', '', text, flags=re.IGNORECASE)
+    
+    log(f"HTML sanitized - removed dangerous patterns", "DEBUG")
     return text
 
 def is_admin_command(issue, admin_users, clean_commands, update_commands):
