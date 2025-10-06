@@ -14,7 +14,13 @@ messages = []
 # Sort issues by number (newest first)
 for issue in sorted(issues, key=lambda i: i.number, reverse=True):
     username = issue.user.login
-    body = issue.body.strip().replace("\r", "")
+    body = issue.body
+    
+    # Handle empty or None body
+    if not body or not body.strip():
+        body = "*[no message]*"
+    else:
+        body = body.strip().replace("\r", "")
     
     # Calculate available space for message (accounting for username and formatting)
     username_prefix = f"{username}: "
@@ -32,15 +38,25 @@ for issue in sorted(issues, key=lambda i: i.number, reverse=True):
 repo_name = os.environ["GITHUB_REPOSITORY"]
 
 # Generate README content with new message button
-chat_content = "# Chat\n\n"
-chat_content += f"[![New Message](https://img.shields.io/badge/💬-New_Message-blue?style=for-the-badge)](https://github.com/{repo_name}/issues/new)\n\n"
+chat_content = "# 💬 Chat\n\n"
+chat_content += f"[![New Message](https://img.shields.io/badge/💬-New_Message-blue?style=for-the-badge)](https://github.com/{repo_name}/issues/new) "
+chat_content += f"[![Online Users](https://img.shields.io/badge/👥-{len(set(msg.split(':')[0] for msg in messages)) if messages else 0}_users-green?style=for-the-badge)](https://github.com/{repo_name}/issues)\n\n"
 
 if messages:
-    chat_content += "---\n\n"  # Add a separator line
-    for message in messages:
-        chat_content += f"**{message}**\n\n"  # Make each message bold and add extra spacing
+    chat_content += "---\n\n"
+    chat_content += f"**💭 {len(messages)} message{'s' if len(messages) != 1 else ''}**\n\n"
+    for i, message in enumerate(messages, 1):
+        # Extract username and message parts
+        parts = message.split(': ', 1)
+        if len(parts) == 2:
+            username, msg = parts
+            chat_content += f"> **@{username}**: {msg}\n\n"
+        else:
+            chat_content += f"> {message}\n\n"
 else:
-    chat_content += "*Waiting for messages...*\n"
+    chat_content += "---\n\n"
+    chat_content += "💭 *No messages yet. Be the first to start the conversation!*\n\n"
+    chat_content += "👆 *Click the button above to send a message*\n"
 
 # Update README.md
 with open("README.md", "w", encoding="utf-8") as f:
