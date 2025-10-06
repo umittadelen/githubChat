@@ -1,29 +1,24 @@
-name: Update Chat README
+name: Update Chat
 on:
   issues:
-    types: [opened, edited]
-
+    types: [opened, edited, closed, reopened]
+  
 jobs:
-  update-chat:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
-      - name: Install PyGithub
-        run: pip install PyGithub
-
-      - name: Update README
-        run: python update_chat.py
-
-      - name: Commit README
-        run: |
+      - run: pip install PyGithub
+      - run: python update_chat.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      - run: |
+          git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git config --local user.email "actions@github.com"
           git add README.md
-          git commit -m "Update chat log" || echo "No changes to commit"
+          git commit -m "Update chat" || exit 0
           git push
