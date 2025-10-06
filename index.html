@@ -557,6 +557,16 @@
         }
         
         function convertMarkdownToHtml(text) {
+            // First, preserve any existing HTML elements
+            const htmlElements = [];
+            let elementIndex = 0;
+            
+            // Preserve HTML tags to protect them from markdown processing
+            text = text.replace(/<[^>]+>/g, (match) => {
+                htmlElements.push(match);
+                return `__HTML_ELEMENT_${elementIndex++}__`;
+            });
+            
             let html = text;
             
             // Convert markdown to HTML - order matters!
@@ -668,6 +678,11 @@
                     return '<p>' + lines.join('<br>') + '</p>';
                 }
             }).filter(p => p).join('\n\n');
+            
+            // Restore preserved HTML elements
+            htmlElements.forEach((element, index) => {
+                html = html.replace(`__HTML_ELEMENT_${index}__`, element);
+            });
             
             return html;
         }
