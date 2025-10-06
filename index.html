@@ -229,6 +229,20 @@
             opacity: 0.7;
         }
         
+        .message-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .message-body img:hover {
+            transform: scale(1.02);
+        }
+        
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -408,7 +422,31 @@
         }
         
         function convertMarkdownToHtml(text) {
-            // Escape HTML first to prevent XSS
+            // First, extract and preserve image tags and other safe HTML
+            const htmlElements = [];
+            let elementIndex = 0;
+            
+            // Preserve image tags
+            text = text.replace(/<img[^>]+>/gi, (match) => {
+                // Validate image src for basic security
+                if (match.includes('src=')) {
+                    htmlElements.push(match);
+                    return `__HTML_ELEMENT_${elementIndex++}__`;
+                }
+                return match;
+            });
+            
+            // Preserve other safe HTML tags (links, basic formatting)
+            const safeTags = ['a', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3'];
+            safeTags.forEach(tag => {
+                const regex = new RegExp(`<\\/?${tag}[^>]*>`, 'gi');
+                text = text.replace(regex, (match) => {
+                    htmlElements.push(match);
+                    return `__HTML_ELEMENT_${elementIndex++}__`;
+                });
+            });
+            
+            // Now escape remaining HTML to prevent XSS
             text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             
             // Convert markdown to HTML
@@ -430,8 +468,11 @@
             // Inline code (after code blocks to avoid conflicts)
             html = html.replace(/`(.*?)`/g, '<code>$1</code>');
             
-            // Links
+            // Links (markdown style)
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+            
+            // Images (markdown style)
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;">');
             
             // Strikethrough
             html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
@@ -465,6 +506,11 @@
             // Clean up empty paragraphs
             html = html.replace(/<p><\/p>/g, '');
             html = html.replace(/<p>\s*<\/p>/g, '');
+            
+            // Restore preserved HTML elements
+            htmlElements.forEach((element, index) => {
+                html = html.replace(`__HTML_ELEMENT_${index}__`, element);
+            });
             
             return html;
         }
