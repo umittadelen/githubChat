@@ -8,6 +8,7 @@ from github import Github
 import os
 import sys
 import time
+import json
 from datetime import datetime
 import re
 
@@ -257,6 +258,30 @@ def main():
         # Generate README content
         log("📝 Generating README content...")
         chat_content = generate_chat_content(messages, repo_name)
+        
+        # Generate JSON data for GitHub Pages
+        log("📊 Generating JSON data for GitHub Pages...")
+        try:
+            json_data = {
+                "last_updated": datetime.now().isoformat(),
+                "total_messages": len(messages),
+                "unique_users": len(set(msg['username'] for msg in messages)) if messages else 0,
+                "messages": [
+                    {
+                        "username": msg['username'],
+                        "user_url": msg['user_url'],
+                        "body": msg['body'],
+                        "timestamp": datetime.now().isoformat()  # In real implementation, use issue creation time
+                    }
+                    for msg in messages
+                ]
+            }
+            
+            with open("chat-data.json", "w", encoding="utf-8") as f:
+                json.dump(json_data, f, indent=2, ensure_ascii=False)
+            log("✅ JSON data generated successfully")
+        except Exception as e:
+            log(f"❌ Error generating JSON data: {e}")
         
         # Update README.md
         log("💾 Updating README.md...")

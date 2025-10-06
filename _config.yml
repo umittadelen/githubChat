@@ -1,0 +1,34 @@
+# GitHub Pages Configuration
+name: GitHub Chat
+description: Real-time chat powered by GitHub Issues
+url: https://umittadelen.github.io
+baseurl: /githubChat
+
+# GitHub Pages settings
+github:
+  repository_nwo: umittadelen/githubChat
+  
+# Build settings
+markdown: kramdown
+highlighter: rouge
+include: [".well-known"]
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - update_chat.py
+  - requirements.txt
+  - .github/
+  - .git/
+
+# SEO settings
+title: GitHub Chat
+author: umittadelen
+twitter:
+  username: umittadelenmc
+  
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 GitHub Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .chat-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .message {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message-header {
+            margin-bottom: 10px;
+        }
+        
+        .username {
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .username:hover {
+            text-decoration: underline;
+        }
+        
+        .message-body {
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .message-body h1, .message-body h2, .message-body h3 {
+            margin: 10px 0;
+        }
+        
+        .message-body p {
+            margin: 8px 0;
+        }
+        
+        .message-body code {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        .message-body pre {
+            background: #f6f8fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 200px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 GitHub Chat</h1>
+            <p>Real-time chat powered by GitHub Issues</p>
+            
+            <div class="buttons">
+                <a href="#" id="newMessageBtn" class="btn btn-primary">
+                    💬 New Message
+                </a>
+                <a href="#" id="refreshBtn" class="btn btn-secondary">
+                    🔄 Refresh
+                </a>
+                <a href="https://github.com/umittadelen/githubChat" class="btn btn-secondary">
+                    📁 View Repository
+                </a>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💭 Messages</h2>
+                <div class="chat-stats">
+                    <div class="stat">
+                        <span>👥</span>
+                        <span id="userCount">0</span>
+                        <span>users</span>
+                    </div>
+                    <div class="stat">
+                        <span>📝</span>
+                        <span id="messageCount">0</span>
+                        <span>messages</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="chatMessages">
+                <div class="loading">
+                    <h3>🔄 Loading messages...</h3>
+                    <p>Please wait while we fetch the latest chat messages.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Last updated: <span id="lastUpdated">Loading...</span></p>
+            <p>Powered by GitHub Issues & GitHub Pages</p>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_REPO = 'umittadelen/githubChat';
+        const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}/issues`;
+        
+        // Set up new message button
+        document.getElementById('newMessageBtn').href = `https://github.com/${GITHUB_REPO}/issues/new?template=chat-message.md`;
+        
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            loadMessages();
+        });
+        
+        // Load messages from GitHub Issues API
+        async function loadMessages() {
+            try {
+                const response = await fetch(`${GITHUB_API}?state=open&sort=created&direction=desc`);
+                const issues = await response.json();
+                
+                // Filter out admin commands and process messages
+                const messages = issues
+                    .filter(issue => {
+                        const body = issue.body ? issue.body.trim().toLowerCase() : '';
+                        const adminCommands = ['/clean', '/reset', '/clear'];
+                        return !adminCommands.includes(body);
+                    })
+                    .slice(0, 50); // Limit to 50 messages
+                
+                displayMessages(messages);
+                updateStats(messages);
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Error Loading Messages</h3>
+                        <p>Failed to load chat messages. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>💭 No messages yet</h3>
+                        <p>Be the first to start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const messagesHtml = messages.map(issue => {
+                const username = issue.user.login;
+                const userUrl = issue.user.html_url;
+                const body = issue.body || '*[no message]*';
+                const createdAt = new Date(issue.created_at).toLocaleString();
+                
+                // Convert markdown to HTML (basic conversion)
+                const htmlBody = convertMarkdownToHtml(body);
+                
+                return `
+                    <div class="message">
+                        <div class="message-header">
+                            <a href="${userUrl}" class="username">@${username}</a>
+                            <span style="color: #999; font-size: 12px; margin-left: 10px;">${createdAt}</span>
+                        </div>
+                        <div class="message-body">${htmlBody}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = messagesHtml;
+        }
+        
+        function convertMarkdownToHtml(text) {
+            // Basic markdown conversion
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        function updateStats(messages) {
+            const uniqueUsers = new Set(messages.map(issue => issue.user.login)).size;
+            document.getElementById('userCount').textContent = uniqueUsers;
+            document.getElementById('messageCount').textContent = messages.length;
+        }
+        
+        function updateLastUpdated() {
+            const now = new Date().toLocaleString();
+            document.getElementById('lastUpdated').textContent = now;
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadMessages, 30000);
+        
+        // Load messages on page load
+        loadMessages();
+    </script>
+</body>
+</html>
