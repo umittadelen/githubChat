@@ -4,21 +4,7 @@
 
 ---
 
-**💭 8 messages**
+**💭 1 message**
 
-> **@umittadelen**: 1927y17yxhiuyi2y7eyw87yt
-
-> **@umittadelen**: qwlkejlkqwjlkejljdlj3lkqj938928213
-
-> **@umittadelen**: *[no message]*
-
-> **@umittadelen**: lkwelkmlqkmlrkmw
-
-> **@umittadelen**: wekjolewkqlkjwql
-
-> **@umittadelen**: mkølekjqjclkj4ljvwkjwqkj
-
-> **@umittadelen**: wliejdliqhjwlhexlwxhl
-
-> **@umittadelen**: test message
+> **@umittadelen**: test
 
