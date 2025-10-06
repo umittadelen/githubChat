@@ -385,6 +385,37 @@
             }
         }
         
+        function generateUserColor(username) {
+            // Generate a consistent color based on username
+            let hash = 0;
+            for (let i = 0; i < username.length; i++) {
+                hash = username.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Generate a pleasant color palette
+            const colors = [
+                '#FF6B6B', // Red
+                '#4ECDC4', // Teal
+                '#45B7D1', // Blue
+                '#96CEB4', // Green
+                '#FFEAA7', // Yellow
+                '#DDA0DD', // Plum
+                '#98D8C8', // Mint
+                '#F7DC6F', // Gold
+                '#BB8FCE', // Purple
+                '#85C1E9', // Light Blue
+                '#F8C471', // Orange
+                '#82E0AA', // Light Green
+                '#F1948A', // Pink
+                '#85C1E9', // Sky Blue
+                '#D7DBDD'  // Light Gray
+            ];
+            
+            // Use hash to select color
+            const colorIndex = Math.abs(hash) % colors.length;
+            return colors[colorIndex];
+        }
+        
         function displayMessages(messages) {
             const container = document.getElementById('chatMessages');
             
@@ -403,18 +434,15 @@
                 const userUrl = issue.user.html_url;
                 const body = issue.body || '*[no message]*';
                 const createdAt = new Date(issue.created_at).toLocaleString();
-                
-                // Generate display name for website (same algorithm as Python)
-                const displayName = generateDisplayName(username);
+                const userColor = generateUserColor(username);
                 
                 // Convert markdown to HTML (basic conversion)
                 const htmlBody = convertMarkdownToHtml(body);
                 
                 return `
-                    <div class="message">
+                    <div class="message" style="border-left-color: ${userColor};">
                         <div class="message-header">
-                            <a href="${userUrl}" class="username">${displayName}</a>
-                            <span style="color: #999; font-size: 12px;">(@${username})</span>
+                            <a href="${userUrl}" class="username" style="color: ${userColor};">@${username}</a>
                             <span style="color: #999; font-size: 12px; margin-left: 10px;">${createdAt}</span>
                         </div>
                         <div class="message-body">${htmlBody}</div>
@@ -532,43 +560,6 @@
         
         // Auto-refresh every 30 seconds
         setInterval(loadMessages, 30000);
-        
-        // Generate display name function (matches Python algorithm)
-        function generateDisplayName(username) {
-            const adjectives = [
-                "Swift", "Brave", "Clever", "Bright", "Bold", "Quick", "Smart", "Cool", 
-                "Epic", "Super", "Mighty", "Noble", "Cosmic", "Royal", "Golden", "Silver",
-                "Crystal", "Thunder", "Lightning", "Storm", "Fire", "Ice", "Star", "Moon",
-                "Solar", "Nova", "Quantum", "Digital", "Cyber", "Tech", "Code", "Binary",
-                "Pixel", "Neon", "Retro", "Future", "Alpha", "Beta", "Prime", "Ultra",
-                "Mega", "Turbo", "Hyper", "Zen", "Mystic", "Shadow", "Ghost", "Phantom"
-            ];
-            
-            const nouns = [
-                "Coder", "Hacker", "Ninja", "Wizard", "Master", "Guardian", "Knight", "Hero",
-                "Champion", "Legend", "Phoenix", "Dragon", "Tiger", "Eagle", "Wolf", "Fox",
-                "Panda", "Bear", "Lion", "Shark", "Falcon", "Raven", "Cat", "Dog",
-                "Robot", "Cyborg", "Android", "Byte", "Bit", "Node", "Core", "Matrix",
-                "Network", "Server", "Client", "Parser", "Builder", "Creator", "Designer",
-                "Artist", "Gamer", "Player", "Runner", "Walker", "Flyer", "Swimmer"
-            ];
-            
-            // Simple hash function for JavaScript (matches Python md5 behavior approximately)
-            let hash = 0;
-            for (let i = 0; i < username.toLowerCase().length; i++) {
-                const char = username.toLowerCase().charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32-bit integer
-            }
-            
-            // Make hash positive and use for selection
-            hash = Math.abs(hash);
-            const adjIndex = hash % adjectives.length;
-            const nounIndex = Math.floor(hash / adjectives.length) % nouns.length;
-            const number = (hash % 999) + 1;
-            
-            return `${adjectives[adjIndex]}${nouns[nounIndex]}${number.toString().padStart(3, '0')}`;
-        }
         
         // Load messages on page load
         loadMessages();

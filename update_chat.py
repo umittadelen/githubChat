@@ -11,8 +11,6 @@ import time
 import json
 from datetime import datetime
 import re
-import hashlib
-import random
 
 # Configuration
 MAX_LENGTH = 500  # max characters per message (increased for HTML content)
@@ -33,41 +31,6 @@ def safe_get_env(var_name, default=None):
         log(f"❌ ERROR: Required environment variable '{var_name}' not found")
         sys.exit(1)
     return value
-
-def generate_display_name(username):
-    """Generate a consistent random display name based on username"""
-    # Lists of fun adjectives and nouns for name generation
-    adjectives = [
-        "Swift", "Brave", "Clever", "Bright", "Bold", "Quick", "Smart", "Cool", 
-        "Epic", "Super", "Mighty", "Noble", "Cosmic", "Royal", "Golden", "Silver",
-        "Crystal", "Thunder", "Lightning", "Storm", "Fire", "Ice", "Star", "Moon",
-        "Solar", "Nova", "Quantum", "Digital", "Cyber", "Tech", "Code", "Binary",
-        "Pixel", "Neon", "Retro", "Future", "Alpha", "Beta", "Prime", "Ultra",
-        "Mega", "Turbo", "Hyper", "Zen", "Mystic", "Shadow", "Ghost", "Phantom"
-    ]
-    
-    nouns = [
-        "Coder", "Hacker", "Ninja", "Wizard", "Master", "Guardian", "Knight", "Hero",
-        "Champion", "Legend", "Phoenix", "Dragon", "Tiger", "Eagle", "Wolf", "Fox",
-        "Panda", "Bear", "Lion", "Shark", "Falcon", "Raven", "Cat", "Dog",
-        "Robot", "Cyborg", "Android", "Byte", "Bit", "Node", "Core", "Matrix",
-        "Network", "Server", "Client", "Parser", "Builder", "Creator", "Designer",
-        "Artist", "Gamer", "Player", "Runner", "Walker", "Flyer", "Swimmer"
-    ]
-    
-    # Create a hash from username for consistent randomness
-    username_hash = hashlib.md5(username.lower().encode()).hexdigest()
-    
-    # Use hash to seed random selection
-    adj_index = int(username_hash[:8], 16) % len(adjectives)
-    noun_index = int(username_hash[8:16], 16) % len(nouns)
-    
-    # Generate number based on hash for uniqueness
-    number = int(username_hash[16:20], 16) % 999 + 1
-    
-    display_name = f"{adjectives[adj_index]}{nouns[noun_index]}{number:03d}"
-    
-    return display_name
 
 def sanitize_html(text):
     """Basic HTML sanitization to prevent XSS"""
@@ -208,6 +171,36 @@ def execute_update_command(repo, admin_users):
         log(f"❌ Critical error during update command: {e}")
         return False
 
+def generate_user_color(username):
+    """Generate a consistent color for a user based on their username"""
+    # Generate hash from username
+    hash_value = 0
+    for char in username:
+        hash_value = ord(char) + ((hash_value << 5) - hash_value)
+    
+    # Pleasant color palette
+    colors = [
+        '#FF6B6B',  # Red
+        '#4ECDC4',  # Teal
+        '#45B7D1',  # Blue
+        '#96CEB4',  # Green
+        '#FFEAA7',  # Yellow
+        '#DDA0DD',  # Plum
+        '#98D8C8',  # Mint
+        '#F7DC6F',  # Gold
+        '#BB8FCE',  # Purple
+        '#85C1E9',  # Light Blue
+        '#F8C471',  # Orange
+        '#82E0AA',  # Light Green
+        '#F1948A',  # Pink
+        '#85C1E9',  # Sky Blue
+        '#D7DBDD'   # Light Gray
+    ]
+    
+    # Select color based on hash
+    color_index = abs(hash_value) % len(colors)
+    return colors[color_index]
+
 def generate_chat_content(messages, repo_name):
     """Generate the README chat content"""
     try:
@@ -229,25 +222,24 @@ def generate_chat_content(messages, repo_name):
             
             for i, message_data in enumerate(messages, 1):
                 username = message_data['username']
-                display_name = message_data.get('display_name', username)  # Fallback to username
                 user_url = message_data['user_url']
                 body = message_data['body']
+                user_color = generate_user_color(username)
                 
-                # Enhanced styling
+                # Enhanced styling with user color
                 message_style = (
                     "margin: 15px 0; padding: 15px; "
-                    "border-left: 4px solid #0366d6; "
+                    f"border-left: 4px solid {user_color}; "
                     "background: linear-gradient(135deg, #f6f8fa 0%, #e1e4e8 100%); "
                     "border-radius: 8px; "
                     "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; "
                     "box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
                 )
-                username_style = "font-weight: bold; color: #0366d6; text-decoration: none; font-size: 14px;"
+                username_style = f"font-weight: bold; color: {user_color}; text-decoration: none; font-size: 14px;"
                 
-                # Show both display name and real username
                 # Use blockquote for message styling that preserves markdown
                 chat_content += f"""<div style="{message_style}">
-<a href="{user_url}" style="{username_style}">{display_name}</a> <span style="color: #666; font-size: 12px;">(@{username})</span>
+<a href="{user_url}" style="{username_style}">@{username}</a>
 </div>
 
 > {body}
@@ -323,14 +315,12 @@ def main():
                 try:
                     username = issue.user.login
                     user_url = f"https://github.com/{username}"
-                    display_name = generate_display_name(username)
                     
                     # Process message body
                     body = process_message_body(issue.body, username, MAX_LENGTH)
                     
                     message_data = {
-                        'username': username,  # Keep original for admin checks
-                        'display_name': display_name,  # New display name
+                        'username': username,
                         'user_url': user_url,
                         'body': body
                     }
@@ -360,9 +350,9 @@ def main():
                 "messages": [
                     {
                         "username": msg['username'],
-                        "display_name": msg.get('display_name', msg['username']),
                         "user_url": msg['user_url'],
                         "body": msg['body'],
+                        "user_color": generate_user_color(msg['username']),
                         "timestamp": datetime.now().isoformat()  # In real implementation, use issue creation time
                     }
                     for msg in messages
