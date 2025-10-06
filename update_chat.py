@@ -168,14 +168,13 @@ def generate_chat_content(messages, repo_name):
                     "box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
                 )
                 username_style = "font-weight: bold; color: #0366d6; text-decoration: none; font-size: 14px;"
-                body_style = "margin-top: 8px; line-height: 1.6; color: #24292e;"
                 
+                # Use blockquote for message styling that preserves markdown
                 chat_content += f"""<div style="{message_style}">
-<div>
 <a href="{user_url}" style="{username_style}">@{username}</a>
 </div>
-<div style="{body_style}">{body}</div>
-</div>
+
+> {body}
 
 """
                 
