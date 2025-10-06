@@ -672,7 +672,12 @@
                 if (!trimmed) return '';
                 
                 // Don't wrap block elements in paragraphs
-                if (trimmed.match(/^<(h[1-6]|ul|ol|blockquote|pre|hr)/)) {
+                if (trimmed.match(/^<(h[1-6]|ul|ol|li|blockquote|pre|hr)/)) {
+                    return trimmed;
+                }
+                
+                // Skip if this looks like list content (contains <li> tags)
+                if (trimmed.includes('<li>') || trimmed.includes('</li>')) {
                     return trimmed;
                 }
                 
