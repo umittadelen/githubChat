@@ -553,7 +553,6 @@
             
             // Preserve image tags
             text = text.replace(/<img[^>]+>/gi, (match) => {
-                // Validate image src for basic security
                 if (match.includes('src=')) {
                     htmlElements.push(match);
                     return `__HTML_ELEMENT_${elementIndex++}__`;
@@ -561,7 +560,7 @@
                 return match;
             });
             
-            // Preserve other safe HTML tags (links, basic formatting)
+            // Preserve other safe HTML tags
             const safeTags = ['a', 'strong', 'em', 'code', 'pre', 'br', 'hr', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3'];
             safeTags.forEach(tag => {
                 const regex = new RegExp(`<\\/?${tag}[^>]*>`, 'gi');
@@ -571,103 +570,111 @@
                 });
             });
             
-            // Now escape remaining HTML to prevent XSS
+            // Escape remaining HTML to prevent XSS
             text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             
-            // Convert markdown to HTML
             let html = text;
             
-            // Headers (must be at start of line)
+            // Convert markdown to HTML - order matters!
+            
+            // 1. Code blocks first (to protect them from other processing)
+            html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+            
+            // 2. Headers
             html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
             html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
             html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
             
-            // Code blocks (triple backticks)
-            html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-            
-            // Bold and italic
-            html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            
-            // Inline code (after code blocks to avoid conflicts)
-            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
-            
-            // Links (markdown style)
-            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-            
-            // Images (markdown style)
-            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;">');
-            
-            // Strikethrough
-            html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
-            
-            // Unordered lists - improved processing
-            html = html.replace(/^\* (.*)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*?<\/li>)/gs, '<ul>$1</ul>');
-            html = html.replace(/<\/li>\s*<li>/g, '</li><li>');
-            
-            // Ordered lists - improved processing  
-            html = html.replace(/^\d+\. (.*)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*?<\/li>)/gs, '<ol>$1</ol>');
-            
-            // Fix nested lists (basic)
-            html = html.replace(/<\/ul>\s*<ul>/g, '');
-            html = html.replace(/<\/ol>\s*<ol>/g, '');
-            
-            // Blockquotes
-            html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
-            html = html.replace(/<\/blockquote>\s*<blockquote>/g, '<br>');
-            
-            // Horizontal rules
+            // 3. Horizontal rules
             html = html.replace(/^---$/gm, '<hr>');
             html = html.replace(/^\*\*\*$/gm, '<hr>');
             
-            // Line breaks - improved to avoid wrapping block elements in paragraphs
-            // Split into lines and process each
+            // 4. Lists - process line by line for better control
             const lines = html.split('\n');
             const processedLines = [];
-            let inBlockElement = false;
+            let inUnorderedList = false;
+            let inOrderedList = false;
             
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
+                let line = lines[i];
+                const trimmedLine = line.trim();
                 
-                // Check if this line contains block elements
-                const isBlockElement = /<\/(ul|ol|blockquote|h[1-6]|hr|pre)>|<(ul|ol|blockquote|h[1-6]|hr|pre)/.test(line);
-                const hasBlockElements = /<(ul|ol|blockquote|h[1-6]|hr|pre|li)/.test(line);
-                
-                if (hasBlockElements) {
-                    inBlockElement = true;
-                    processedLines.push(line);
-                } else if (line === '') {
-                    if (!inBlockElement && processedLines.length > 0) {
-                        processedLines.push('</p><p>');
-                    } else {
-                        processedLines.push('');
+                // Check for unordered list items
+                if (trimmedLine.match(/^\* (.+)$/)) {
+                    const content = trimmedLine.replace(/^\* (.+)$/, '$1');
+                    if (!inUnorderedList) {
+                        processedLines.push('<ul>');
+                        inUnorderedList = true;
                     }
-                    inBlockElement = false;
-                } else {
-                    if (!inBlockElement && processedLines.length > 0 && !processedLines[processedLines.length - 1].endsWith('<p>')) {
-                        processedLines.push('<br>');
+                    if (inOrderedList) {
+                        processedLines.push('</ol>');
+                        inOrderedList = false;
+                    }
+                    processedLines.push(`<li>${content}</li>`);
+                }
+                // Check for ordered list items
+                else if (trimmedLine.match(/^\d+\. (.+)$/)) {
+                    const content = trimmedLine.replace(/^\d+\. (.+)$/, '$1');
+                    if (!inOrderedList) {
+                        processedLines.push('<ol>');
+                        inOrderedList = true;
+                    }
+                    if (inUnorderedList) {
+                        processedLines.push('</ul>');
+                        inUnorderedList = false;
+                    }
+                    processedLines.push(`<li>${content}</li>`);
+                }
+                // Regular line
+                else {
+                    if (inUnorderedList) {
+                        processedLines.push('</ul>');
+                        inUnorderedList = false;
+                    }
+                    if (inOrderedList) {
+                        processedLines.push('</ol>');
+                        inOrderedList = false;
                     }
                     processedLines.push(line);
-                    inBlockElement = false;
                 }
             }
             
+            // Close any remaining lists
+            if (inUnorderedList) processedLines.push('</ul>');
+            if (inOrderedList) processedLines.push('</ol>');
+            
             html = processedLines.join('\n');
             
-            // Wrap remaining content in paragraphs, but avoid wrapping block elements
-            html = html.replace(/^(?!<(ul|ol|blockquote|h[1-6]|hr|pre))/gm, '<p>');
-            html = html.replace(/(?<!<\/(ul|ol|blockquote|h[1-6]|hr|pre)>)$/gm, '</p>');
+            // 5. Other formatting
+            html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+            html = html.replace(/~~(.*?)~~/g, '<del>$1</del>');
             
-            // Clean up empty paragraphs and malformed ones
-            html = html.replace(/<p><\/(ul|ol|blockquote|h[1-6]|hr|pre)>/g, '</$1>');
-            html = html.replace(/<(ul|ol|blockquote|h[1-6]|hr|pre)([^>]*)><\/p>/g, '<$1$2>');
-            html = html.replace(/<p><\/p>/g, '');
-            html = html.replace(/<p>\s*<\/p>/g, '');
+            // 6. Links and images
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;">');
             
-            // Restore preserved HTML elements
+            // 7. Blockquotes
+            html = html.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+            html = html.replace(/<\/blockquote>\n<blockquote>/g, '<br>');
+            
+            // 8. Simple paragraph and line break handling
+            html = html.split('\n\n').map(paragraph => {
+                const trimmed = paragraph.trim();
+                if (!trimmed) return '';
+                
+                // Don't wrap block elements in paragraphs
+                if (trimmed.match(/^<(h[1-6]|ul|ol|blockquote|pre|hr)/)) {
+                    return trimmed.replace(/\n/g, '\n');
+                }
+                
+                // Regular paragraph
+                return '<p>' + trimmed.replace(/\n/g, '<br>') + '</p>';
+            }).filter(p => p).join('\n\n');
+            
+            // 9. Restore preserved HTML elements
             htmlElements.forEach((element, index) => {
                 html = html.replace(`__HTML_ELEMENT_${index}__`, element);
             });
