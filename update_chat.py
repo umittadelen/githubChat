@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 GitHub Chat System - A real-time chat using GitHub Issues
+Production-ready version with comprehensive error handling, monitoring, and security.
 Supports markdown, HTML, and admin commands for moderation.
 """
 
@@ -9,28 +10,89 @@ import os
 import sys
 import time
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import re
+import logging
+from typing import Optional, List, Dict, Any
+import traceback
 
-# Configuration
+# Production Configuration
 MAX_LENGTH = 500  # max characters per message (increased for HTML content)
-ADMIN_USERS = ["umittadelen"]  # List of admin users
+ADMIN_USERS = ["umittadelen"]  # List of admin users - should be env var in production
 CLEAN_COMMANDS = ["/clean", "/reset", "/clear"]  # Only slash commands for security
 UPDATE_COMMANDS = ["/update", "/refresh", "/redraw"]  # Commands to trigger manual update
-MAX_MESSAGES = 50  # Limit number of messages to prevent performance issues
+MAX_MESSAGES = 100  # Increased for production
+API_TIMEOUT = 30  # GitHub API timeout in seconds
+RETRY_ATTEMPTS = 3  # Number of retry attempts for API calls
+BACKUP_FILE = "chat-data-backup.json"  # Backup file path
 
-def log(message):
-    """Enhanced logging with timestamps"""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"[{timestamp}] {message}")
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('chat-system.log', mode='a')
+    ]
+)
 
-def safe_get_env(var_name, default=None):
-    """Safely get environment variables with error handling"""
+def log(message: str, level: str = "INFO") -> None:
+    """Enhanced logging with structured format and levels"""
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    
+    if level == "ERROR":
+        logging.error(f"[{timestamp}] {message}")
+    elif level == "WARNING":
+        logging.warning(f"[{timestamp}] {message}")
+    elif level == "DEBUG":
+        logging.debug(f"[{timestamp}] {message}")
+    else:
+        logging.info(f"[{timestamp}] {message}")
+
+def safe_get_env(var_name: str, default: Optional[str] = None) -> str:
+    """Safely get environment variables with error handling and validation"""
     value = os.environ.get(var_name, default)
     if not value and default is None:
-        log(f"❌ ERROR: Required environment variable '{var_name}' not found")
-        sys.exit(1)
+        error_msg = f"Required environment variable '{var_name}' not found"
+        log(error_msg, "ERROR")
+        raise EnvironmentError(error_msg)
+    
+    # Validate GitHub token format
+    if var_name == "GH_TOKEN" and value and not value.startswith(("ghp_", "gho_", "ghu_", "ghs_", "ghr_")):
+        log(f"Warning: GitHub token format may be invalid", "WARNING")
+    
     return value
+
+def retry_on_failure(max_attempts: int = RETRY_ATTEMPTS):
+    """Decorator for retrying failed operations"""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(max_attempts):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    if attempt < max_attempts - 1:
+                        wait_time = 2 ** attempt  # Exponential backoff
+                        log(f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time}s...", "WARNING")
+                        time.sleep(wait_time)
+                    else:
+                        log(f"All {max_attempts} attempts failed", "ERROR")
+            raise last_exception
+        return wrapper
+    return decorator
+
+def create_backup(data: Dict[str, Any]) -> bool:
+    """Create backup of chat data"""
+    try:
+        with open(BACKUP_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        log(f"Backup created successfully: {BACKUP_FILE}")
+        return True
+    except Exception as e:
+        log(f"Failed to create backup: {e}", "ERROR")
+        return False
 
 def sanitize_html(text):
     """Basic HTML sanitization to prevent XSS"""

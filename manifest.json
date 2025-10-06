@@ -1,0 +1,66 @@
+{
+  "name": "GitHub Chat - Real-time Public Chat",
+  "short_name": "GitHub Chat",
+  "description": "Real-time public chat system powered by GitHub Issues with markdown support and rich content.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0969da",
+  "theme_color": "#0969da",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "social", "developer"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%230969da' rx='20'/><text x='96' y='130' text-anchor='middle' font-size='120' fill='white'>💬</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%230969da' rx='50'/><text x='256' y='340' text-anchor='middle' font-size='320' fill='white'>💬</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect width='1280' height='720' fill='%23f6f8fa'/><text x='640' y='360' text-anchor='middle' font-size='48' fill='%230969da'>GitHub Chat Interface</text></svg>",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "GitHub Chat main interface"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Message",
+      "short_name": "New Message",
+      "description": "Create a new chat message",
+      "url": "https://github.com/umittadelen/githubChat/issues/new?template=chat-message.md",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='0.9em' font-size='90'>✏️</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Repository",
+      "short_name": "Repo",
+      "description": "View GitHub repository",
+      "url": "https://github.com/umittadelen/githubChat",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><text y='0.9em' font-size='90'>📁</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}
