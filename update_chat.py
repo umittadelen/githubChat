@@ -113,16 +113,12 @@ if messages:
 </div>
 
 """
+        
+        # Add separator between messages (except after the last message)
+        if i < len(messages):
+            chat_content += "---\n\n"
 else:
     chat_content += "---\n\n"
-    chat_content += "💭 *No messages yet. Be the first to start the conversation!*\n\n"
-    chat_content += "👆 *Click the button above to send a message*\n\n"
-    chat_content += "✨ *Tip: You can use **markdown**, HTML tags, CSS styling, and images in your messages!*\n\n"
-    chat_content += """**Examples:**
-- `<img src="https://via.placeholder.com/150" alt="image">`
-- `<div style="color: red; font-size: 20px;">Styled text</div>`
-- `<details><summary>Click me</summary>Hidden content</details>`
-"""
 
 # Update README.md
 with open("README.md", "w", encoding="utf-8") as f:
