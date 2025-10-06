@@ -370,7 +370,7 @@
                 const messages = issues
                     .filter(issue => {
                         const body = issue.body ? issue.body.trim().toLowerCase() : '';
-                        const adminCommands = ['/clean', '/reset', '/clear'];
+                        const adminCommands = ['/clean', '/reset', '/clear', '/update', '/refresh', '/redraw'];
                         return !adminCommands.includes(body);
                     })
                     .slice(0, 50); // Limit to 50 messages
