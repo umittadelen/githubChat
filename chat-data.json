@@ -1,31 +1,35 @@
 {
-  "last_updated": "2025-10-06T10:44:03.721472",
+  "last_updated": "2025-10-06T11:00:13.079226",
   "total_messages": 4,
   "unique_users": 2,
   "messages": [
     {
       "username": "umittadelen",
+      "display_name": "EpicBuilder325",
       "user_url": "https://github.com/umittadelen",
       "body": "Hello\n<img src=\"https://media.istockphoto.com/id/816752606/photo/tv-test-card-or-test-pattern-generic.jpg?s=612x612&w=0&k=20&c=63Jcx_5bFnvBw9elRDLrLKjtDYXr70pKtUK0jXJ2_uY=\">",
-      "timestamp": "2025-10-06T10:44:03.721478"
+      "timestamp": "2025-10-06T11:00:13.079234"
     },
     {
       "username": "goldenXlight",
+      "display_name": "SmartLion430",
       "user_url": "https://github.com/goldenXlight",
       "body": "*[no message]*",
-      "timestamp": "2025-10-06T10:44:03.721480"
+      "timestamp": "2025-10-06T11:00:13.079236"
     },
     {
       "username": "goldenXlight",
+      "display_name": "SmartLion430",
       "user_url": "https://github.com/goldenXlight",
       "body": "ytugohipjok",
-      "timestamp": "2025-10-06T10:44:03.721481"
+      "timestamp": "2025-10-06T11:00:13.079237"
     },
     {
       "username": "goldenXlight",
+      "display_name": "SmartLion430",
       "user_url": "https://github.com/goldenXlight",
       "body": "hello umit",
-      "timestamp": "2025-10-06T10:44:03.721482"
+      "timestamp": "2025-10-06T11:00:13.079238"
     }
   ]
 }
