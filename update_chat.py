@@ -1,7 +1,7 @@
 from github import Github
 import os
 
-MAX_LENGTH = 100  # max characters per message
+MAX_LENGTH = 500  # max characters per message (increased for HTML content)
 
 # Connect to GitHub
 g = Github(os.environ["GH_TOKEN"])
@@ -39,11 +39,19 @@ else:
         else:
             body = body.strip().replace("\r", "")
         
+        # For HTML content, be more generous with length limits
+        # Check if message contains HTML tags
+        contains_html = '<' in body and '>' in body
+        
         # Calculate available space for message (accounting for clickable username and formatting)
-        # Account for markdown link format: [username](url)
-        username_link = f"[**@{username}**]({user_url})"
         username_prefix_length = len(f"@{username}: ")  # Calculate length as if it were plain text
-        available_length = MAX_LENGTH - username_prefix_length
+        
+        if contains_html:
+            # For HTML content, use a more generous limit
+            available_length = MAX_LENGTH * 2 - username_prefix_length
+        else:
+            # For regular text, use normal limit
+            available_length = MAX_LENGTH - username_prefix_length
         
         # Cut message to available length and add "…" if trimmed
         if len(body) > available_length:
@@ -68,19 +76,53 @@ chat_content += f"[![Online Users](https://img.shields.io/badge/👥-{len(set(ms
 if messages:
     chat_content += "---\n\n"
     chat_content += f"**💭 {len(messages)} message{'s' if len(messages) != 1 else ''}**\n\n"
+    
+    # Add CSS styling for chat messages
+    chat_content += """<style>
+.chat-message {
+    margin: 10px 0;
+    padding: 12px;
+    border-left: 4px solid #0366d6;
+    background: #f6f8fa;
+    border-radius: 6px;
+}
+.chat-username {
+    font-weight: bold;
+    color: #0366d6;
+    text-decoration: none;
+}
+.chat-username:hover {
+    text-decoration: underline;
+}
+.chat-body {
+    margin-top: 4px;
+}
+</style>
+
+"""
+    
     for i, message_data in enumerate(messages, 1):
         username = message_data['username']
         user_url = message_data['user_url']
         body = message_data['body']
         
-        # Create clickable username link and render markdown in message body
-        username_link = f"[**@{username}**]({user_url})"
-        chat_content += f"> {username_link}: {body}\n\n"
+        # Create HTML-styled message container
+        chat_content += f"""<div class="chat-message">
+<a href="{user_url}" class="chat-username">@{username}</a>
+<div class="chat-body">{body}</div>
+</div>
+
+"""
 else:
     chat_content += "---\n\n"
     chat_content += "💭 *No messages yet. Be the first to start the conversation!*\n\n"
     chat_content += "👆 *Click the button above to send a message*\n\n"
-    chat_content += "✨ *Tip: You can use **markdown** formatting in your messages!*\n"
+    chat_content += "✨ *Tip: You can use **markdown**, HTML tags, CSS styling, and images in your messages!*\n\n"
+    chat_content += """**Examples:**
+- `<img src="https://via.placeholder.com/150" alt="image">`
+- `<div style="color: red; font-size: 20px;">Styled text</div>`
+- `<details><summary>Click me</summary>Hidden content</details>`
+"""
 
 # Update README.md
 with open("README.md", "w", encoding="utf-8") as f:
