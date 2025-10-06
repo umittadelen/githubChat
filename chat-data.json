@@ -1,13 +1,19 @@
 {
-  "last_updated": "2025-10-06T09:55:29.142773",
-  "total_messages": 1,
+  "last_updated": "2025-10-06T10:01:26.039035",
+  "total_messages": 2,
   "unique_users": 1,
   "messages": [
     {
       "username": "umittadelen",
       "user_url": "https://github.com/umittadelen",
+      "body": "<head>\n  <meta charset=\"UTF-8\">\n  <title>Message Example</title>\n  <style>\n    body {\n      font-family: \"Poppins\", sans-serif;\n      background: #f7f7ff;\n      display: flex;\n      justify-content: center;\n      align-items: center;\n      height: 100vh;\n    }\n    .message-box {\n      background: white;\n      border-radius: 16px;\n      box-shadow: 0 4px 12px rgba(0,0,0,0.1);\n      padding: 20px 30px;\n      max-width: 400px;\n      text-align: center;\n    }\n    .message-box h2 {\n      color: #6a5acd;\n      margin-bottom: 10px;\n    }\n    .message-box p {\n      color: #555;\n      font-size: 16px;\n    }\n    .message-box button {\n      margin-top: 15px;\n      background: #6a5acd;\n      color: white;\n      border: none;\n      padding: 8px 16px;\n      border-radius: 8px;\n      cursor: pointer;\n      transition: 0.2s;\n    }\n    .message-box button:hover {\n      background: #5a4bcf;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"message-box\">\n    <h2>✨ Hello There! ✨</h2>\n    <p>Th…",
+      "timestamp": "2025-10-06T10:01:26.039043"
+    },
+    {
+      "username": "umittadelen",
+      "user_url": "https://github.com/umittadelen",
       "body": "test",
-      "timestamp": "2025-10-06T09:55:29.142780"
+      "timestamp": "2025-10-06T10:01:26.039045"
     }
   ]
 }
