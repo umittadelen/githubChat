@@ -392,14 +392,93 @@
                 hash = username.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // Use hash to generate HSL values for unlimited unique colors
+            // Use hash to generate HSL values
             const hue = Math.abs(hash) % 360; // 0-359 degrees for hue
+            const saturation = 60 + (Math.abs(hash >> 8) % 40); // 60-100% saturation for vibrant colors
             
-            // Generate saturation and lightness that ensure good readability
-            const saturation = 45 + (Math.abs(hash >> 8) % 35); // 45-80% saturation
-            const lightness = 35 + (Math.abs(hash >> 16) % 20); // 35-55% lightness
+            // Find lightness that ensures proper contrast ratio
+            let lightness = findOptimalLightness(hue, saturation);
             
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+        
+        function findOptimalLightness(hue, saturation) {
+            // Try different lightness values to find one with good contrast
+            for (let l = 20; l <= 45; l += 2) {
+                const color = hslToRgb(hue, saturation, l);
+                const contrast = getContrastRatio(color, {r: 255, g: 255, b: 255}); // white background
+                
+                if (contrast >= 7.0) { // Aim for very readable (7:1)
+                    return l;
+                }
+            }
+            
+            // Fallback to ensure at least 4.5:1 contrast
+            for (let l = 20; l <= 45; l += 1) {
+                const color = hslToRgb(hue, saturation, l);
+                const contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+                
+                if (contrast >= 4.5) {
+                    return l;
+                }
+            }
+            
+            return 30; // Safe fallback
+        }
+        
+        function hslToRgb(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+            
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
+        }
+        
+        function getLuminance(color) {
+            // Convert RGB to relative luminance
+            const rsRGB = color.r / 255;
+            const gsRGB = color.g / 255;
+            const bsRGB = color.b / 255;
+            
+            const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4);
+            const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4);
+            const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+            
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+        
+        function getContrastRatio(color1, color2) {
+            const lum1 = getLuminance(color1);
+            const lum2 = getLuminance(color2);
+            
+            const brightest = Math.max(lum1, lum2);
+            const darkest = Math.min(lum1, lum2);
+            
+            return (brightest + 0.05) / (darkest + 0.05);
         }
         
         function displayMessages(messages) {

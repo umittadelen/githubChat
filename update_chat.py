@@ -172,24 +172,44 @@ def execute_update_command(repo, admin_users):
         return False
 
 def generate_user_color(username):
-    """Generate a consistent color for a user based on their username"""
+    """Generate a consistent color for a user based on their username with proper contrast ratio"""
     # Generate hash from username
     hash_value = 0
     for char in username:
         hash_value = ord(char) + ((hash_value << 5) - hash_value)
     
-    # Use hash to generate HSL values for unlimited unique colors
+    # Use hash to generate HSL values
     hue = abs(hash_value) % 360  # 0-359 degrees for hue
+    saturation = 60 + (abs(hash_value >> 8) % 40)  # 60-100% saturation for vibrant colors
     
-    # Generate saturation and lightness that ensure good readability
-    saturation = 45 + (abs(hash_value >> 8) % 35)  # 45-80% saturation
-    lightness = 35 + (abs(hash_value >> 16) % 20)  # 35-55% lightness
+    # Find lightness that ensures proper contrast ratio
+    lightness = find_optimal_lightness(hue, saturation)
     
     # Convert HSL to hex for HTML/CSS compatibility
     return hsl_to_hex(hue, saturation, lightness)
 
-def hsl_to_hex(h, s, l):
-    """Convert HSL to hex color"""
+def find_optimal_lightness(hue, saturation):
+    """Find lightness value that ensures contrast ratio ≥ 7:1 (or fallback to 4.5:1)"""
+    # Try different lightness values to find one with good contrast
+    for l in range(20, 46, 2):
+        color = hsl_to_rgb(hue, saturation, l)
+        contrast = get_contrast_ratio(color, (255, 255, 255))  # white background
+        
+        if contrast >= 7.0:  # Aim for very readable (7:1)
+            return l
+    
+    # Fallback to ensure at least 4.5:1 contrast
+    for l in range(20, 46):
+        color = hsl_to_rgb(hue, saturation, l)
+        contrast = get_contrast_ratio(color, (255, 255, 255))
+        
+        if contrast >= 4.5:
+            return l
+    
+    return 30  # Safe fallback
+
+def hsl_to_rgb(h, s, l):
+    """Convert HSL to RGB tuple"""
     # Normalize values
     h = h / 360.0
     s = s / 100.0
@@ -217,11 +237,37 @@ def hsl_to_hex(h, s, l):
         g = hue_to_rgb(p, q, h)
         b = hue_to_rgb(p, q, h - 1/3)
     
-    # Convert to hex
-    r = int(round(r * 255))
-    g = int(round(g * 255))
-    b = int(round(b * 255))
+    # Convert to 0-255 range
+    return (int(round(r * 255)), int(round(g * 255)), int(round(b * 255)))
+
+def get_luminance(color):
+    """Calculate relative luminance of RGB color"""
+    r, g, b = [c / 255.0 for c in color]
     
+    # Convert to linear RGB
+    def linearize(c):
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    
+    r_lin = linearize(r)
+    g_lin = linearize(g)
+    b_lin = linearize(b)
+    
+    # Calculate luminance
+    return 0.2126 * r_lin + 0.7152 * g_lin + 0.0722 * b_lin
+
+def get_contrast_ratio(color1, color2):
+    """Calculate contrast ratio between two RGB colors"""
+    lum1 = get_luminance(color1)
+    lum2 = get_luminance(color2)
+    
+    brightest = max(lum1, lum2)
+    darkest = min(lum1, lum2)
+    
+    return (brightest + 0.05) / (darkest + 0.05)
+
+def hsl_to_hex(h, s, l):
+    """Convert HSL to hex color"""
+    r, g, b = hsl_to_rgb(h, s, l)
     return f"#{r:02x}{g:02x}{b:02x}"
 
 def generate_chat_content(messages, repo_name):
