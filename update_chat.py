@@ -36,7 +36,9 @@ chat_content = "# Chat\n\n"
 chat_content += f"[![New Message](https://img.shields.io/badge/💬-New_Message-blue?style=for-the-badge)](https://github.com/{repo_name}/issues/new)\n\n"
 
 if messages:
-    chat_content += "\n".join(messages) + "\n"
+    chat_content += "---\n\n"  # Add a separator line
+    for message in messages:
+        chat_content += f"**{message}**\n\n"  # Make each message bold and add extra spacing
 else:
     chat_content += "*Waiting for messages...*\n"
 
