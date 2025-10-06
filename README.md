@@ -4,7 +4,7 @@
 
 ---
 
-**💭 1 message**
+**💭 2 messages**
 
 <style>
 .chat-message {
@@ -26,6 +26,13 @@
     margin-top: 4px;
 }
 </style>
+
+<div class="chat-message">
+<a href="https://github.com/umittadelen" class="chat-username">@umittadelen</a>
+<div class="chat-body">test</div>
+</div>
+
+---
 
 <div class="chat-message">
 <a href="https://github.com/umittadelen" class="chat-username">@umittadelen</a>
