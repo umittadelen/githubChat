@@ -360,9 +360,13 @@ def main():
                     # Process message body
                     body = process_message_body(issue.body, username, MAX_LENGTH)
                     
+                    # Get user avatar URL
+                    avatar_url = issue.user.avatar_url if issue.user.avatar_url else f"https://github.com/{username}.png"
+                    
                     message_data = {
                         'username': username,
                         'user_url': user_url,
+                        'avatar_url': avatar_url,
                         'body': body
                     }
                     messages.append(message_data)
@@ -388,6 +392,7 @@ def main():
                     {
                         "username": msg['username'],
                         "user_url": msg['user_url'],
+                        "avatar_url": msg['avatar_url'],
                         "body": msg['body'],
                         "user_color": generate_user_color(msg['username']),
                         "timestamp": datetime.now().isoformat()  # In real implementation, use issue creation time
