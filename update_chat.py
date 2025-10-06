@@ -180,33 +180,63 @@ def generate_user_color(username):
     
     # Use hash to generate HSL values
     hue = abs(hash_value) % 360  # 0-359 degrees for hue
-    saturation = 60 + (abs(hash_value >> 8) % 40)  # 60-100% saturation for vibrant colors
+    saturation = 70 + (abs(hash_value >> 8) % 30)  # 70-100% saturation for vibrant colors
     
     # Find lightness that ensures proper contrast ratio
-    lightness = find_optimal_lightness(hue, saturation)
+    lightness = find_optimal_lightness_for_hue(hue, saturation, hash_value)
     
     # Convert HSL to hex for HTML/CSS compatibility
     return hsl_to_hex(hue, saturation, lightness)
 
-def find_optimal_lightness(hue, saturation):
-    """Find lightness value that ensures contrast ratio ≥ 7:1 (or fallback to 4.5:1)"""
-    # Try different lightness values to find one with good contrast
-    for l in range(20, 46, 2):
-        color = hsl_to_rgb(hue, saturation, l)
-        contrast = get_contrast_ratio(color, (255, 255, 255))  # white background
-        
-        if contrast >= 7.0:  # Aim for very readable (7:1)
-            return l
+def find_optimal_lightness_for_hue(hue, saturation, hash_value):
+    """Find lightness value that ensures contrast while allowing full color range"""
+    # Generate a base lightness from hash for consistency
+    base_lightness = 30 + (abs(hash_value >> 16) % 40)  # 30-70% base range
     
-    # Fallback to ensure at least 4.5:1 contrast
-    for l in range(20, 46):
-        color = hsl_to_rgb(hue, saturation, l)
-        contrast = get_contrast_ratio(color, (255, 255, 255))
-        
-        if contrast >= 4.5:
-            return l
+    # Test the preferred lightness first
+    color = hsl_to_rgb(hue, saturation, base_lightness)
+    contrast = get_contrast_ratio(color, (255, 255, 255))
     
-    return 30  # Safe fallback
+    if contrast >= 4.5:
+        return base_lightness  # Perfect, use the preferred lightness
+    
+    # If preferred lightness doesn't work, find the closest one that does
+    test_ranges = [
+        # Test around the preferred lightness first
+        (max(15, base_lightness - 20), min(80, base_lightness + 20), 2),
+        # Then test the full range if needed
+        (15, 80, 3)
+    ]
+    
+    for min_l, max_l, step in test_ranges:
+        # Test darker first (usually better contrast)
+        for l in range(base_lightness, min_l - 1, -step):
+            color = hsl_to_rgb(hue, saturation, l)
+            contrast = get_contrast_ratio(color, (255, 255, 255))
+            if contrast >= 7.0:
+                return l  # Prefer 7:1 ratio
+        
+        # Test lighter
+        for l in range(base_lightness, max_l + 1, step):
+            color = hsl_to_rgb(hue, saturation, l)
+            contrast = get_contrast_ratio(color, (255, 255, 255))
+            if contrast >= 7.0:
+                return l
+        
+        # Fallback to 4.5:1 if 7:1 not found
+        for l in range(base_lightness, min_l - 1, -step):
+            color = hsl_to_rgb(hue, saturation, l)
+            contrast = get_contrast_ratio(color, (255, 255, 255))
+            if contrast >= 4.5:
+                return l
+        
+        for l in range(base_lightness, max_l + 1, step):
+            color = hsl_to_rgb(hue, saturation, l)
+            contrast = get_contrast_ratio(color, (255, 255, 255))
+            if contrast >= 4.5:
+                return l
+    
+    return 25  # Ultimate fallback
 
 def hsl_to_rgb(h, s, l):
     """Convert HSL to RGB tuple"""

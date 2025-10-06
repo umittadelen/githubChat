@@ -394,36 +394,64 @@
             
             // Use hash to generate HSL values
             const hue = Math.abs(hash) % 360; // 0-359 degrees for hue
-            const saturation = 60 + (Math.abs(hash >> 8) % 40); // 60-100% saturation for vibrant colors
+            const saturation = 70 + (Math.abs(hash >> 8) % 30); // 70-100% saturation for vibrant colors
             
             // Find lightness that ensures proper contrast ratio
-            let lightness = findOptimalLightness(hue, saturation);
+            let lightness = findOptimalLightnessForHue(hue, saturation, hash);
             
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
         
-        function findOptimalLightness(hue, saturation) {
-            // Try different lightness values to find one with good contrast
-            for (let l = 20; l <= 45; l += 2) {
-                const color = hslToRgb(hue, saturation, l);
-                const contrast = getContrastRatio(color, {r: 255, g: 255, b: 255}); // white background
+        function findOptimalLightnessForHue(hue, saturation, hash) {
+            // Generate a base lightness from hash for consistency
+            const baseLightness = 30 + (Math.abs(hash >> 16) % 40); // 30-70% base range
+            
+            // Test the preferred lightness first
+            let color = hslToRgb(hue, saturation, baseLightness);
+            let contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+            
+            if (contrast >= 4.5) {
+                return baseLightness; // Perfect, use the preferred lightness
+            }
+            
+            // If preferred lightness doesn't work, find the closest one that does
+            const testRanges = [
+                // Test around the preferred lightness first
+                [Math.max(15, baseLightness - 20), Math.min(80, baseLightness + 20), 2],
+                // Then test the full range if needed
+                [15, 80, 3]
+            ];
+            
+            for (const [minL, maxL, step] of testRanges) {
+                // Test darker first (usually better contrast)
+                for (let l = baseLightness; l >= minL; l -= step) {
+                    color = hslToRgb(hue, saturation, l);
+                    contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+                    if (contrast >= 7.0) return l; // Prefer 7:1 ratio
+                }
                 
-                if (contrast >= 7.0) { // Aim for very readable (7:1)
-                    return l;
+                // Test lighter
+                for (let l = baseLightness; l <= maxL; l += step) {
+                    color = hslToRgb(hue, saturation, l);
+                    contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+                    if (contrast >= 7.0) return l;
+                }
+                
+                // Fallback to 4.5:1 if 7:1 not found
+                for (let l = baseLightness; l >= minL; l -= step) {
+                    color = hslToRgb(hue, saturation, l);
+                    contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+                    if (contrast >= 4.5) return l;
+                }
+                
+                for (let l = baseLightness; l <= maxL; l += step) {
+                    color = hslToRgb(hue, saturation, l);
+                    contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
+                    if (contrast >= 4.5) return l;
                 }
             }
             
-            // Fallback to ensure at least 4.5:1 contrast
-            for (let l = 20; l <= 45; l += 1) {
-                const color = hslToRgb(hue, saturation, l);
-                const contrast = getContrastRatio(color, {r: 255, g: 255, b: 255});
-                
-                if (contrast >= 4.5) {
-                    return l;
-                }
-            }
-            
-            return 30; // Safe fallback
+            return 25; // Ultimate fallback
         }
         
         function hslToRgb(h, s, l) {
