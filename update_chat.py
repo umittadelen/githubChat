@@ -11,40 +11,44 @@ repo = g.get_repo(os.environ["GITHUB_REPOSITORY"])
 issues = repo.get_issues(state="open")
 messages = []
 
-# Sort issues by number (newest first)
-for issue in sorted(issues, key=lambda i: i.number, reverse=True):
-    username = issue.user.login
-    body = issue.body
-    
-    # Handle admin commands (only for umittadelen)
-    if username == "umittadelen" and body and body.strip().lower() == "/clean":
+# Check for admin clean command first
+clean_requested = False
+for issue in issues:
+    if issue.user.login == "umittadelen" and issue.body and issue.body.strip().lower() == "/clean":
         print("🧹 Admin command detected: Cleaning chat...")
-        # Close all open issues to clean the chat
-        for clean_issue in repo.get_issues(state="open"):
-            clean_issue.edit(state="closed")
-            print(f"Closed issue #{clean_issue.number}")
-        print("✅ Chat cleaned successfully!")
-        # Clear messages list since we closed all issues
-        messages = []
+        clean_requested = True
         break
-    
-    # Handle empty or None body
-    if not body or not body.strip():
-        body = "*[no message]*"
-    else:
-        body = body.strip().replace("\r", "")
-    
-    # Calculate available space for message (accounting for username and formatting)
-    username_prefix = f"{username}: "
-    available_length = MAX_LENGTH - len(username_prefix)
-    
-    # Cut message to available length and add "…" if trimmed
-    if len(body) > available_length:
-        body = body[:available_length-1] + "…"
-    
-    # Format as "username: message"
-    formatted_message = f"{username}: {body}"
-    messages.append(formatted_message)
+
+# If clean was requested, close all issues
+if clean_requested:
+    for clean_issue in repo.get_issues(state="open"):
+        clean_issue.edit(state="closed")
+        print(f"Closed issue #{clean_issue.number}")
+    print("✅ Chat cleaned successfully!")
+    messages = []  # No messages to display
+else:
+    # Sort issues by number (newest first) and process messages
+    for issue in sorted(issues, key=lambda i: i.number, reverse=True):
+        username = issue.user.login
+        body = issue.body
+        
+        # Handle empty or None body
+        if not body or not body.strip():
+            body = "*[no message]*"
+        else:
+            body = body.strip().replace("\r", "")
+        
+        # Calculate available space for message (accounting for username and formatting)
+        username_prefix = f"{username}: "
+        available_length = MAX_LENGTH - len(username_prefix)
+        
+        # Cut message to available length and add "…" if trimmed
+        if len(body) > available_length:
+            body = body[:available_length-1] + "…"
+        
+        # Format as "username: message"
+        formatted_message = f"{username}: {body}"
+        messages.append(formatted_message)
 
 # Get repository info for the button link
 repo_name = os.environ["GITHUB_REPOSITORY"]
