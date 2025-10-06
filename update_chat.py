@@ -16,6 +16,7 @@ import re
 MAX_LENGTH = 500  # max characters per message (increased for HTML content)
 ADMIN_USERS = ["umittadelen"]  # List of admin users
 CLEAN_COMMANDS = ["/clean", "/reset", "/clear"]  # Only slash commands for security
+UPDATE_COMMANDS = ["/update", "/refresh", "/redraw"]  # Commands to trigger manual update
 MAX_MESSAGES = 50  # Limit number of messages to prevent performance issues
 
 def log(message):
@@ -50,7 +51,7 @@ def sanitize_html(text):
     
     return text
 
-def is_admin_command(issue, admin_users, clean_commands):
+def is_admin_command(issue, admin_users, clean_commands, update_commands):
     """Check if an issue contains an admin command"""
     try:
         if not issue or not issue.user:
@@ -61,7 +62,13 @@ def is_admin_command(issue, admin_users, clean_commands):
             return False, None
             
         body = issue.body.strip().lower() if issue.body else ""
+        
+        # Check for clean commands
         if body in clean_commands:
+            return True, body
+            
+        # Check for update commands
+        if body in update_commands:
             return True, body
             
         return False, None
@@ -133,6 +140,35 @@ def execute_clean_command(repo, admin_users):
         
     except Exception as e:
         log(f"❌ Critical error during clean command: {e}")
+        return False
+
+def execute_update_command(repo, admin_users):
+    """Execute the update command to refresh README and JSON files"""
+    try:
+        log("🔄 Executing update command...")
+        
+        # Close the update command issue
+        issues = list(repo.get_issues(state="open"))
+        update_issue = None
+        
+        for issue in issues:
+            body = issue.body.strip().lower() if issue.body else ""
+            if body in UPDATE_COMMANDS:
+                update_issue = issue
+                break
+        
+        if update_issue:
+            try:
+                update_issue.edit(state="closed")
+                log(f"✅ Closed update command issue #{update_issue.number}")
+            except Exception as e:
+                log(f"❌ Failed to close update issue: {e}")
+        
+        log("✅ Update command completed - will regenerate README and JSON")
+        return True
+        
+    except Exception as e:
+        log(f"❌ Critical error during update command: {e}")
         return False
 
 def generate_chat_content(messages, repo_name):
@@ -217,14 +253,24 @@ def main():
         
         # Check for admin commands
         clean_requested = False
+        update_requested = False
+        
         for issue in issues:
-            is_admin, command = is_admin_command(issue, ADMIN_USERS, CLEAN_COMMANDS)
+            is_admin, command = is_admin_command(issue, ADMIN_USERS, CLEAN_COMMANDS, UPDATE_COMMANDS)
             if is_admin:
-                log(f"🧹 Admin command '{command}' detected from @{issue.user.login} in issue #{issue.number}")
-                if execute_clean_command(repo, ADMIN_USERS):
-                    clean_requested = True
-                    issues = []  # Clear issues list since they're all closed
-                break
+                log(f"🔧 Admin command '{command}' detected from @{issue.user.login} in issue #{issue.number}")
+                
+                if command in CLEAN_COMMANDS:
+                    if execute_clean_command(repo, ADMIN_USERS):
+                        clean_requested = True
+                        issues = []  # Clear issues list since they're all closed
+                    break
+                elif command in UPDATE_COMMANDS:
+                    if execute_update_command(repo, ADMIN_USERS):
+                        update_requested = True
+                        # Remove the update command issue from the list
+                        issues = [i for i in issues if i.number != issue.number]
+                    break
         
         # Process messages if no clean was requested
         messages = []
@@ -254,8 +300,12 @@ def main():
                     continue
             
             log(f"✅ Processed {len(messages)} messages")
+            
+            # Add update info if update was requested
+            if update_requested:
+                log("🔄 Update command processed - README and JSON will be regenerated with current structure")
         
-        # Generate README content
+        # Generate README content (always generate, even after clean or update)
         log("📝 Generating README content...")
         chat_content = generate_chat_content(messages, repo_name)
         
