@@ -143,7 +143,7 @@ def execute_clean_command(repo, admin_users):
         return False
 
 def execute_update_command(repo, admin_users):
-    """Execute the update command to refresh README and JSON files"""
+    """Execute the update command to refresh JSON files"""
     try:
         log("🔄 Executing update command...")
         
@@ -164,7 +164,7 @@ def execute_update_command(repo, admin_users):
             except Exception as e:
                 log(f"❌ Failed to close update issue: {e}")
         
-        log("✅ Update command completed - will regenerate README and JSON")
+        log("✅ Update command completed - will regenerate JSON data")
         return True
         
     except Exception as e:
@@ -300,64 +300,6 @@ def hsl_to_hex(h, s, l):
     r, g, b = hsl_to_rgb(h, s, l)
     return f"#{r:02x}{g:02x}{b:02x}"
 
-def generate_chat_content(messages, repo_name):
-    """Generate the README chat content"""
-    try:
-        # Header
-        chat_content = "# 💬 Chat\n\n"
-        
-        # Buttons
-        unique_users = len(set(msg['username'] for msg in messages)) if messages else 0
-        chat_content += f"[![New Message](https://img.shields.io/badge/💬-New_Message-blue?style=for-the-badge)](https://github.com/{repo_name}/issues/new?template=chat-message.md) "
-        chat_content += f"[![Online Users](https://img.shields.io/badge/👥-{unique_users}_users-green?style=for-the-badge)](https://github.com/{repo_name}/issues) "
-        chat_content += f"[![Messages](https://img.shields.io/badge/📝-{len(messages)}_messages-orange?style=for-the-badge)](#)\n\n"
-        
-        if messages:
-            chat_content += "---\n\n"
-            
-            # Add timestamp info
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
-            chat_content += f"*Last updated: {timestamp}*\n\n"
-            
-            for i, message_data in enumerate(messages, 1):
-                username = message_data['username']
-                user_url = message_data['user_url']
-                body = message_data['body']
-                user_color = generate_user_color(username)
-                
-                # Enhanced styling with user color
-                message_style = (
-                    "margin: 15px 0; padding: 15px; "
-                    f"border-left: 4px solid {user_color}; "
-                    "background: linear-gradient(135deg, #f6f8fa 0%, #e1e4e8 100%); "
-                    "border-radius: 8px; "
-                    "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; "
-                    "box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
-                )
-                username_style = f"font-weight: bold; color: {user_color}; text-decoration: none; font-size: 14px;"
-                
-                # Use blockquote for message styling that preserves markdown
-                chat_content += f"""<div style="{message_style}">
-<a href="{user_url}" style="{username_style}">@{username}</a>
-</div>
-
-> {body}
-
-"""
-                
-                # Add separator between messages (except after the last message)
-                if i < len(messages):
-                    chat_content += "---\n\n"
-        else:
-            chat_content += "---\n\n"
-            chat_content += "*Chat is empty. Start the conversation!*\n\n"
-        
-        return chat_content
-        
-    except Exception as e:
-        log(f"❌ Error generating chat content: {e}")
-        return "# 💬 Chat\n\n*Error generating chat content*\n"
-
 def main():
     """Main function with comprehensive error handling"""
     try:
@@ -433,11 +375,7 @@ def main():
             
             # Add update info if update was requested
             if update_requested:
-                log("🔄 Update command processed - README and JSON will be regenerated with current structure")
-        
-        # Generate README content (always generate, even after clean or update)
-        log("📝 Generating README content...")
-        chat_content = generate_chat_content(messages, repo_name)
+                log("🔄 Update command processed - JSON will be regenerated with current structure")
         
         # Generate JSON data for GitHub Pages
         log("📊 Generating JSON data for GitHub Pages...")
@@ -463,15 +401,6 @@ def main():
             log("✅ JSON data generated successfully")
         except Exception as e:
             log(f"❌ Error generating JSON data: {e}")
-        
-        # Update README.md
-        log("💾 Updating README.md...")
-        try:
-            with open("README.md", "w", encoding="utf-8") as f:
-                f.write(chat_content)
-            log("✅ README.md updated successfully")
-        except Exception as e:
-            log(f"❌ Error writing README.md: {e}")
             return False
         
         log("🎉 GitHub Chat update completed successfully!")
