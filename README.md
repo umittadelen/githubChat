@@ -4,7 +4,9 @@
 
 ---
 
-**💭 1 message**
+**💭 2 messages**
 
-> **@umittadelen**: test
+> [**@umittadelen**](https://github.com/umittadelen): **Hello** *world* with `code` and [links](https://example.com)!
+
+> [**@umittadelen**](https://github.com/umittadelen): test
 
