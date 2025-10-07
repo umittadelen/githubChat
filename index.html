@@ -314,6 +314,7 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-height: 315px; /* Fallback minimum height */
         }
         
         .message-body .iframe-container iframe {
@@ -325,6 +326,7 @@
             margin: 0;
             border-radius: 8px;
             box-shadow: none;
+            border: 1px solid #d0d7de;
         }
         
         .message-body br {
@@ -910,6 +912,11 @@
                     .replace(/width\s*=\s*["'][^"']*["']/gi, '')
                     .replace(/height\s*=\s*["'][^"']*["']/gi, '')
                     .trim();
+                
+                // Add space before attributes if they exist
+                if (cleanAttributes) {
+                    cleanAttributes = ' ' + cleanAttributes;
+                }
                 
                 // Check if it's a YouTube iframe for optimal aspect ratio
                 const isYouTube = attributes.includes('youtube.com') || attributes.includes('youtu.be');
