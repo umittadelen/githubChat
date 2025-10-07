@@ -102,7 +102,6 @@ def sanitize_html(text):
     # Remove potentially dangerous tags and attributes
     dangerous_patterns = [
         r'<script[^>]*>.*?</script>',
-        r'<iframe[^>]*>.*?</iframe>',
         r'<object[^>]*>.*?</object>',
         r'<embed[^>]*>.*?</embed>',
         r'<form[^>]*>.*?</form>',
@@ -110,6 +109,33 @@ def sanitize_html(text):
         r'<textarea[^>]*>.*?</textarea>',
         r'<select[^>]*>.*?</select>',
     ]
+    
+    # Handle iframes more carefully - allow trusted domains only
+    safe_iframe_domains = [
+        'youtube.com', 'youtu.be', 'www.youtube.com',
+        'vimeo.com', 'player.vimeo.com',
+        'codepen.io', 'jsfiddle.net',
+        'github.com', 'gist.github.com'
+    ]
+    
+    # Remove dangerous iframes but allow trusted ones
+    iframe_pattern = r'<iframe[^>]*>.*?</iframe>'
+    iframes = re.findall(iframe_pattern, text, flags=re.IGNORECASE | re.DOTALL)
+    
+    for iframe in iframes:
+        # Check if iframe src contains trusted domain
+        src_match = re.search(r'src\s*=\s*["\']([^"\']+)["\']', iframe, re.IGNORECASE)
+        if src_match:
+            src_url = src_match.group(1)
+            is_safe = any(domain in src_url.lower() for domain in safe_iframe_domains)
+            if not is_safe:
+                # Remove unsafe iframe
+                text = text.replace(iframe, '')
+                log(f"Removed unsafe iframe with src: {src_url}", "WARNING")
+        else:
+            # Remove iframe without src
+            text = text.replace(iframe, '')
+            log("Removed iframe without src attribute", "WARNING")
     
     # Remove dangerous event handlers (allow onclick, onmouseover, onmouseout for safe interactions)
     dangerous_events = [
